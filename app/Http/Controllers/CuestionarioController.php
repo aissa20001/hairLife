@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Cuestionario;
 use App\Models\CuestionarioEnvio;
 use App\Models\Respuesta;
-use App\Models\Usuario; // Descomenta si vas a usar el modelo Usuario
+use App\Models\Usuario;
+use App\Models\Producto;
+use App\Models\Recomendacion;
+use App\Models\Pregunta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth; // Para la autenticación, si la usas
@@ -110,12 +113,59 @@ class CuestionarioController extends Controller
             }
         }
 
-        return redirect()->route('cuestionarios.gracias', ['nick' => $nick])
-            ->with('success', '¡Cuestionario enviado con éxito, ' . htmlspecialchars($nick) . '!');
+        $productoRecomendado = null;
+        $recomendacionCreada = null;
+
+        // Obtener el ID de la pregunta "Filtro Recomendación" dinámicamente
+        // Asegúrate de que el enunciado sea EXACTAMENTE el mismo que en tu BD
+        $preguntaFiltroObj = Pregunta::where('enunciado', '¿Qué producto quieres que te recomendemos?')->first();
+        $idPreguntaFiltro = $preguntaFiltroObj ? $preguntaFiltroObj->id : null;
+
+        if ($idPreguntaFiltro && isset($respuestasEnviadas[$idPreguntaFiltro])) {
+            $categoriaElegida = $respuestasEnviadas[$idPreguntaFiltro]; // ej: 'champu', 'aceite'
+
+            if ($categoriaElegida !== 'todo') {
+                // Buscar un producto de esa categoría.
+                // Puedes hacer esta lógica más sofisticada (ej. basado en otras respuestas)
+                $productoRecomendado = Producto::where('categoria', $categoriaElegida)
+                    // ->where(...) // Aquí podrías añadir más filtros basados en otras respuestas
+                    ->inRandomOrder() // Para variar si hay varios
+                    ->first();
+            } else {
+                // Si elige "todo", recomendar uno popular o aleatorio de cualquier categoría
+                $productoRecomendado = Producto::inRandomOrder()->first();
+            }
+        }
+
+        // Si no se encontró un producto por filtro o no hubo filtro, tomar uno general
+        if (!$productoRecomendado) {
+            $productoRecomendado = Producto::inRandomOrder()->first(); // Fallback: producto aleatorio
+        }
+
+        if ($productoRecomendado) {
+            $recomendacionCreada = Recomendacion::create([
+                'envio_id' => $envio->id,
+                'id_producto' => $productoRecomendado->idproducto, // Usa la clave primaria correcta de tu tabla producto
+                'justificacion_titulo' => "Una sugerencia para ti: " . $productoRecomendado->nombre,
+                'justificacion_detalle' => "Hemos seleccionado este producto basado en tus preferencias.",
+            ]);
+        }
+        // --- FIN: Lógica de Recomendación ---
+
+        if ($recomendacionCreada) {
+            return redirect()->route('cuestionarios.gracias', ['nick' => $nick, 'recomendacionId' => $recomendacionCreada->id])
+                ->with('success', '¡Cuestionario enviado! Estamos preparando tu recomendación...');
+        } else {
+            // Si por alguna razón no se pudo crear una recomendación (ej. no hay productos)
+            return redirect()->route('cuestionarios.gracias', ['nick' => $nick]) // No se pasa recomendacionId
+                ->with('success', '¡Cuestionario enviado con éxito, ' . htmlspecialchars($nick) . '!');
+        }
     }
-    public function mostrarPaginaGracias($nick)
+
+    // Método para mostrar la página de gracias (MODIFICADO para aceptar recomendacionId opcional)
+    public function mostrarPaginaGracias($nick, $recomendacionId = null)
     {
         // Puedes pasar datos si tu vista 'gracias' los necesita
-        return view('cuestionarios.gracias', ['nick' => $nick]);
+        return view('cuestionarios.gracias', ['nick' => $nick, 'recomendacionId' => $recomendacionId]);
     }
 }

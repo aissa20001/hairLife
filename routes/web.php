@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CuestionarioController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RecomendacionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,4 +36,6 @@ Route::get('/u/{nick}/peinados-cortes', [HomeController::class, 'showPeinadosCor
 Route::get('/cuestionarios', [CuestionarioController::class, 'listar'])->name('cuestionarios.listar');
 Route::get('/u/{nick}/cuestionario/{id_cuestionario}', [CuestionarioController::class, 'mostrarParaNick'])->name('cuestionarios.mostrarParaNick');
 Route::post('/u/{nick}/cuestionario/{id_cuestionario}/enviar', [CuestionarioController::class, 'procesarEnvioParaNick'])->name('cuestionarios.enviarParaNick');
-Route::get('/gracias/{nick}', [CuestionarioController::class, 'mostrarPaginaGracias'])->name('cuestionarios.gracias');
+// --- Rutas de las Recomendaciones ---
+Route::get('/gracias/{nick}/{recomendacionId?}', [CuestionarioController::class, 'mostrarPaginaGracias'])->name('cuestionarios.gracias');
+Route::get('/recomendacion/{id}', [RecomendacionController::class, 'verRecomendacion'])->name('recomendacion.ver_producto');

@@ -74,10 +74,10 @@ class LoginController extends Controller
             // Guardar el nick en la base de datos
             $usuario->nick = $request->input('nick');
             $usuario->save();
-            $nick = $request->input('nick');
+            $nick_guardado_en_bd = $usuario->nick; // El nick que se guardó en la columna 'nick'
 
-            // Redirigir al cliente al panel después de guardar el nick
-            return redirect()->route('user.dashboard', ['nick' => $nick]);  // O la URL que corresponda
+            // Rediriges usando el nick que vino del formulario y se guardó.
+            return redirect()->route('user.dashboard', ['nick' => $nick_guardado_en_bd]);
         }
 
         return back()->withErrors(['error' => 'Error al guardar el nick.']);

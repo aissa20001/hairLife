@@ -47,21 +47,54 @@
             margin-bottom: 25px;
         }
 
-        .btn-primary {
+        /* Estilos para el loader */
+        .loader-container {
+            display: none;
+            /* Oculto por defecto, se muestra si hay recomendacionId */
+            padding: 20px;
+            text-align: center;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3;
+            /* Light grey */
+            border-top: 8px solid #7952b3;
+            /* Tu color principal o el que prefieras */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 1.2em;
+            color: #5a3d8a;
+            /* Un tono más oscuro de tu color principal */
+        }
+
+        .btn-home {
             display: inline-block;
             margin-top: 15px;
-            padding: 12px 28px;
-            background-color: #7952b3;
+            padding: 10px 20px;
+            background-color: #6c757d;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            font-weight: 600;
-            font-size: 1em;
-            transition: background-color 0.2s ease-in-out;
         }
 
-        .btn-primary:hover {
-            background-color: #5a3d8a;
+        .btn-home:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
@@ -74,16 +107,43 @@
         @if (session('success'))
         <p>{{ session('success') }}</p>
         @else
-        <p>Gracias por completar nuestro cuestionario. Tus respuestas nos ayudarán a ofrecerte las mejores recomendaciones.</p>
+        <p>Gracias por completar nuestro cuestionario.</p>
         @endif
 
-        @isset($nick)
-        <p>Puedes volver a tu panel para explorar otras opciones.</p>
-        <a href="{{ route('user.dashboard', ['nick' => $nick]) }}" class="btn-primary">Volver al Panel de {{ htmlspecialchars($nick) }}</a>
+        {{-- Contenedor del Loader y mensaje de redirección --}}
+        {{-- Comprueba si la variable $recomendacionId existe y no es null --}}
+        @if (isset($recomendacionId) && $recomendacionId !== null)
+        <div class="loader-container" id="loaderContainer">
+            <div class="loader"></div>
+            <p class="loading-text">Estamos preparando tu recomendación personalizada...</p>
+        </div>
         @else
-        <a href="{{ route('home') }}" class="btn-primary">Volver a la página principal</a>
-        @endisset
+        <p>Revisaremos tus respuestas. ¡Gracias por tu tiempo!</p>
+        {{-- Enlace para volver si no hay recomendación automática --}}
+        <a href="{{ route('crear.nick') }}" class="btn-home">Volver al inicio</a>
+        @endif
     </div>
+
+    {{-- Solo ejecuta el script de redirección si $recomendacionId está presente y tiene valor --}}
+    @if (isset($recomendacionId) && $recomendacionId !== null)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar el loader
+            var loaderContainer = document.getElementById('loaderContainer');
+            if (loaderContainer) {
+                loaderContainer.style.display = 'block';
+            }
+
+            // Redirigir después de 5 segundos
+            setTimeout(function() {
+                // Redirige a la ruta que mostrará la recomendación.
+                // Esta ruta la definiremos en el siguiente paso (Fase 3).
+                // El nombre de la ruta será 'recomendacion.ver' y le pasamos el $recomendacionId.
+                window.location.href = "{{ route('recomendacion.ver_producto', ['id' => $recomendacionId]) }}";
+            }, 5000); // 5000 milisegundos = 5 segundos
+        });
+    </script>
+    @endif
 </body>
 
 </html>
