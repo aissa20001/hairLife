@@ -3,22 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cuestionario;
-use Illuminate\Http\Request;
+use App\Models\Usuario; // ¡ASEGÚRATE DE IMPORTAR EL MODELO USUARIO!
+use Illuminate\Http\Request; // No se usa en los métodos actuales, pero es buena práctica tenerlo si lo añades.
 
 class HomeController extends Controller
 {
-    /**
-     * Muestra el panel principal para un nick específico.
-     */
-    public function mostrar($nick) // Coincide con la ruta 'user.dashboard'
+    public function mostrar($nickDeURL) // Este $nickDeURL será el 'Nombre' del usuario
     {
-        // Busca el primer cuestionario activo para enlazarlo.
+        // Busca al usuario por su 'Nombre' que viene en la URL
+        $usuario = Usuario::where('Nombre', $nickDeURL)->firstOrFail();
+
         $cuestionarioOficial = Cuestionario::where('estado', 'ACTIVO')->orderBy('id')->first();
 
-        // La vista se llama 'user_dashboard.show' (asumiendo que renombraste home.blade.php)
+        // La vista se llama 'user_dashboard.show'
         return view('user_dashboard.show', [
-            'nick' => $nick,
-            'cuestionarioOficial' => $cuestionarioOficial
+            'nick' => $usuario->Nombre, // El Nombre principal que identifica al usuario
+            'displayNick' => $usuario->nick, // El nick de display (de la columna 'nick'), puede ser null
+            'cuestionarioOficial' => $cuestionarioOficial,
+            // Puedes añadir una variable para indicar si necesita completar el nick de display
+            'necesitaCompletarNick' => session('necesita_completar_nick_display', false)
         ]);
     }
 

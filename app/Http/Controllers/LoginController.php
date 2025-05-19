@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+// Asegúrate de tener estos 'use' si los necesitas dentro de los métodos
+// use Illuminate\Support\Facades\Hash;
+// use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
-
-
     public function mostrarLogin()
     {
-        return view('login'); // Asegúrate de tener login.blade.php
+        return view('login');
     }
 
     public function login(Request $request)
@@ -19,67 +20,76 @@ class LoginController extends Controller
         $credentials = $request->only('Nombre', 'Clave');
 
         $usuario = Usuario::where('Nombre', $credentials['Nombre'])
-            ->where('Clave', $credentials['Clave'])
+            ->where('Clave', $credentials['Clave']) // ¡RECUERDA HASHEAR CLAVES EN PRODUCCIÓN!
             ->first();
 
         if ($usuario) {
-            // Iniciar sesión con datos del usuario
             session([
                 'usuario_codigo' => $usuario->Codigo,
-                'usuario_nombre' => $usuario->Nombre,
-                'usuario_rol' => $usuario->Rol
+                'usuario_nombre' => $usuario->Nombre, // Este es el Nombre usado para login
+                'usuario_rol' => $usuario->Rol,
+                'usuario_display_nick' => $usuario->nick // Guardamos también el nick de display (columna 'nick')
             ]);
-            // Determinar la URL de redirección según el rol y si tiene nick
-            $urlDestino = '/dashboard'; // Valor por defecto
 
-            if ($usuario->Rol == 1) {
-                $urlDestino = url('/admin'); // Rol 1 (Admin) redirige a /admin
-            } elseif ($usuario->Rol == 0) {
+            $urlDestino = '/'; // Fallback genérico
+
+            if ($usuario->Rol == 1) { // Admin
+                $urlDestino = url('/admin'); // Asegúrate que la ruta /admin exista
+            } elseif ($usuario->Rol == 0) { // Usuario normal
+                // Redirigir SIEMPRE al dashboard usando el 'Nombre' del usuario
+                // como el parámetro 'nick' para la ruta 'user.dashboard'.
+                $urlDestino = route('user.dashboard', ['nick' => $usuario->Nombre]);
+
+                // Opcional: si la columna 'nick' de la BD está vacía,
+                // podrías añadir un flag a la sesión para recordarle al usuario que lo complete en su panel.
                 if (!$usuario->nick) {
-                    $urlDestino = url('/crear-nick'); // Rol 0 sin nick, redirige a crear nick
-                } else {
-                    $urlDestino = route('user.dashboard', ['nick' => $usuario->nick]); // Rol 0 con nick, redirige al dashboard con nick
+                    session(['necesita_completar_nick_display' => true]);
                 }
             }
-
-            return redirect($urlDestino); // Redirigir a la URL correspondiente
+            return redirect($urlDestino);
         }
 
         return back()->withErrors(['login' => 'Nombre o clave incorrectos']);
     }
-    protected function authenticated(Request $request, $user)
-    {
-        // Redirigir a la página para ingresar el nick.
-        return redirect()->route('cuestionario.mostrar_formulario_nick');
-    }
 
     public function logout()
     {
-        session()->flush(); // Limpiar la sesión
-        return redirect('/login'); // Redirigir al login
+        session()->flush();
+        return redirect('/login');
     }
+
     public function mostrarNick()
     {
-        return view('crearNick');  // Vista para mostrar el formulario de creación de nick
+        // Si el usuario ya está logueado (tiene 'usuario_codigo' en sesión)
+        // y llega aquí, es porque quiere establecer/cambiar su nick de display.
+        if (!session('usuario_codigo')) {
+            // Si no hay usuario en sesión, no debería estar aquí, lo mandamos a login.
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión primero.');
+        }
+        return view('crearNick');
     }
+
     public function guardarNick(Request $request)
     {
         $request->validate([
-            'nick' => 'required|string|max:50',  // Validación básica del nick
+            'nick' => 'required|string|max:50', // Puedes añadir unique:usuarios,nick si quieres que sea único
         ]);
-        $nick = '';
+
         $usuario = Usuario::find(session('usuario_codigo'));
 
         if ($usuario) {
-            // Guardar el nick en la base de datos
-            $usuario->nick = $request->input('nick');
+            $usuario->nick = $request->input('nick'); // Actualiza la columna 'nick'
             $usuario->save();
-            $nick_guardado_en_bd = $usuario->nick; // El nick que se guardó en la columna 'nick'
 
-            // Rediriges usando el nick que vino del formulario y se guardó.
-            return redirect()->route('user.dashboard', ['nick' => $nick_guardado_en_bd]);
+            // Actualiza el nick de display en la sesión también
+            session(['usuario_display_nick' => $usuario->nick]);
+            session()->forget('necesita_completar_nick_display'); // Quita el flag si existía
+
+            // Redirige al dashboard usando el 'Nombre' del usuario para la ruta
+            return redirect()->route('user.dashboard', ['nick' => $usuario->Nombre])
+                ->with('success', 'Nick actualizado correctamente.');
         }
 
-        return back()->withErrors(['error' => 'Error al guardar el nick.']);
+        return back()->withErrors(['error' => 'Error al guardar el nick. Usuario no encontrado o sesión expirada.']);
     }
 }
