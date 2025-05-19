@@ -35,6 +35,4 @@ Route::get('/u/{nick}/peinados-cortes', [HomeController::class, 'showPeinadosCor
 Route::get('/cuestionarios', [CuestionarioController::class, 'listar'])->name('cuestionarios.listar');
 Route::get('/u/{nick}/cuestionario/{id_cuestionario}', [CuestionarioController::class, 'mostrarParaNick'])->name('cuestionarios.mostrarParaNick');
 Route::post('/u/{nick}/cuestionario/{id_cuestionario}/enviar', [CuestionarioController::class, 'procesarEnvioParaNick'])->name('cuestionarios.enviarParaNick');
-Route::get('/u/{nick}/cuestionario/gracias', function ($nick) {
-    return view('cuestionarios.gracias', ['nick' => $nick]);
-})->name('cuestionarios.graciasParaNick');
+Route::get('/gracias/{nick}', [CuestionarioController::class, 'mostrarPaginaGracias'])->name('cuestionarios.gracias');

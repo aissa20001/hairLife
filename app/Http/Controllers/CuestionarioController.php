@@ -110,7 +110,12 @@ class CuestionarioController extends Controller
             }
         }
 
-        return redirect()->route('cuestionarios.graciasParaNick', ['nick' => $nick])
+        return redirect()->route('cuestionarios.gracias', ['nick' => $nick])
             ->with('success', '¡Cuestionario enviado con éxito, ' . htmlspecialchars($nick) . '!');
+    }
+    public function mostrarPaginaGracias($nick)
+    {
+        // Puedes pasar datos si tu vista 'gracias' los necesita
+        return view('cuestionarios.gracias', ['nick' => $nick]);
     }
 }
