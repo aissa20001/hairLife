@@ -45,8 +45,14 @@ class LoginController extends Controller
                 if (!$usuario->nick) {
                     session(['necesita_completar_nick_display' => true]);
                 }
+                return redirect()->route('crear.nick')->with('info', 'Por favor, establece tu nick para continuar.');
+            } else {
+                // Si ya tiene nick, va a su dashboard
+                // Y nos aseguramos de que la bandera no esté o se quite
+                session()->forget('necesita_completar_nick_display');
+                $urlDestino = route('user.dashboard', ['nick' => $usuario->Nombre]);
+                return redirect($urlDestino);
             }
-            return redirect($urlDestino);
         }
 
         return back()->withErrors(['login' => 'Nombre o clave incorrectos']);

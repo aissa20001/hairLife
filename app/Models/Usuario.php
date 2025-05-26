@@ -18,6 +18,7 @@ class Usuario extends Model // O solo `Model` si no es para autenticación de La
         'Nombre',
         'Clave', // ¡Recuerda hashear las contraseñas!
         'Rol',
+        'nick',
     ];
 
     protected $hidden = [
