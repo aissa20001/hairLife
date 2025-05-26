@@ -1,162 +1,239 @@
+HTML
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de {{ htmlspecialchars($nick) }} - Mi Pelo</title>
+    <title>Panel de {{ htmlspecialchars($nick) }} - HairLife</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --purple-primary: #6a0dad;
+            --purple-secondary: #8e44ad;
+            --purple-dark: #4c0b56;
+            --purple-light-bg: #f8f5f9;
+            --section-bg: #ffffff;
+            --text-on-purple: #ffffff;
+            --card-bg: #ffffff;
+            --card-shadow: rgba(106, 13, 173, 0.1);
+            --card-hover-shadow: rgba(106, 13, 173, 0.2);
+            --card-border-color: #efdbf5;
+            --icon-color: var(--purple-secondary);
+        }
+
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f7f6;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--purple-light-bg);
             color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        .header-container {
-            width: 100%;
-            color: black;
-            padding: 20px 0;
-            text-align: center;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-container h1 {
-            margin: 0;
-            font-size: 2.5em;
-        }
-
-        .header-container p {
-            margin-top: 5px;
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .buttons-panel {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 25px;
-            width: 100%;
-            max-width: 600px;
-            padding: 0 20px;
-            box-sizing: border-box;
         }
 
-        .panel-button {
-            display: block;
-            width: 100%;
-            padding: 30px 20px;
-            background-color: #ffffff;
-            color: #333333;
-            text-decoration: none;
-            font-size: 1.5em;
-            font-weight: bold;
+        .header-panel {
+            background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary)), url('https://placehold.co/1920x400/4c0b56/8e44ad.png?text=HairLife+Banner&font=dancing-script') no-repeat center center;
+            background-size: cover;
+            background-blend-mode: overlay;
+            color: var(--text-on-purple);
+            padding: 60px 20px;
             text-align: center;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
-            box-sizing: border-box;
+            position: relative;
         }
 
-        .panel-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-
+        .header-panel h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
         }
 
-        .panel-button .button-title {
+        .header-panel p {
+            font-size: 1.4rem;
+            opacity: 0.95;
+            margin-bottom: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .buttons-panel-section {
+            padding-top: 50px;
+            padding-bottom: 50px;
+            background-color: var(--section-bg);
+            border-bottom: 1px solid #eee;
+            border-top: 1px solid #eee;
+        }
+
+        .cards-container {
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .panel-card-link {
+            text-decoration: none;
+            color: inherit;
             display: block;
-            margin-bottom: 8px;
-
+            height: 100%;
         }
 
-        .panel-button .button-description {
-            font-size: 0.7em;
-            color: #555555;
-            font-weight: normal;
+        .panel-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border-color);
+            border-radius: 15px;
+            box-shadow: 0 6px 12px var(--card-shadow);
+            transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 10px 20px var(--card-hover-shadow);
+        }
+
+        .panel-card .card-icon {
+            font-size: 3rem;
+            color: var(--icon-color);
+            margin-bottom: 15px;
+            transition: transform 0.25s ease-in-out;
+        }
+
+        .panel-card:hover .card-icon {
+            transform: scale(1.1);
+        }
+
+        .panel-card .card-body {
+            padding: 30px 25px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .panel-card .button-title {
+            font-size: 1.7em;
+            font-weight: 700;
+            color: var(--purple-primary);
+            margin-bottom: 10px;
+        }
+
+        .panel-card .button-description {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.5;
         }
 
         .button-disabled {
-            background-color: #e9ecef;
+            background-color: #f8f9fa;
+            opacity: 0.6;
             pointer-events: none;
+            border-color: #e0e0e0;
         }
 
-        .button-disabled .button-title {}
+        .button-disabled .button-title {
+            color: #6c757d;
+        }
+
+        .button-disabled .card-icon {
+            opacity: 0.5;
+        }
 
         .site-footer {
-            margin-top: auto;
-            padding: 25px 0;
+            background-color: var(--purple-dark);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 30px 0;
             text-align: center;
             font-size: 0.9em;
-            width: 100%;
+            margin-top: auto;
         }
 
-        @media (min-width: 768px) {
-            .buttons-panel {
-                flex-direction: row;
-                justify-content: space-around;
-                max-width: 900px;
-            }
-
-            .panel-button {
-                width: calc(33.333% - 20px);
-                min-height: 180px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
+        .site-footer p {
+            margin-bottom: 0;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="header-container">
+    <header class="header-panel">
         <h1>¡Hola, {{ htmlspecialchars($nick) }}!</h1>
-        <p>Selecciona una opción para continuar</p>
-    </div>
+        <p>Bienvenid@ a tu espacio en HairLife</p>
+    </header>
 
-    <div class="buttons-panel">
-        {{-- Botón 1: Mi Pelo (Placeholder) --}}
-        <a href="{{ route('user.mipelo', ['nick' => $nick]) }}" class="panel-button">
-            <span class="button-title">Mi Pelo</span>
-            <span class="button-description">Gestiona tu perfil capilar. (En desarrollo)</span>
-        </a>
+    <section class="buttons-panel-section">
+        <div class="container cards-container">
+            {{-- LÍNEA CORREGIDA --}}
+            <div class="row justify-content-center g-4 g-lg-5">
 
-        {{-- Botón 2: Cuestionario (Funcional) --}}
-        @if ($cuestionarioOficial)
-        <a href="{{ route('cuestionarios.mostrarParaNick', ['nick' => $nick, 'id_cuestionario' => $cuestionarioOficial->id]) }}" class="panel-button">
-            <span class="button-title">Cuestionario</span>
-            <span class="button-description">Obtén recomendaciones personalizadas.</span>
-        </a>
-        @else
-        {{-- Se muestra si no hay cuestionario activo --}}
-        <div class="panel-button button-disabled">
-            <span class="button-title">Cuestionario</span>
-            <span class="button-description">No disponible actualmente.</span>
+                {{-- LÍNEA CORREGIDA --}}
+                <div class="col-lg-4 col-md-6 col-sm-10">
+                    <a href="{{ route('user.mipelo', ['nick' => $nick]) }}" class="panel-card-link">
+                        <div class="card panel-card">
+                            <div class="card-body">
+                                <i class="bi bi-person-hearts card-icon"></i>
+                                <span class="button-title">Mi Pelo</span>
+                                <span class="button-description">Gestiona tu perfil capilar. (En desarrollo)</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- LÍNEA CORREGIDA --}}
+                <div class="col-lg-4 col-md-6 col-sm-10">
+                    @if ($cuestionarioOficial)
+                    <a href="{{ route('cuestionarios.mostrarParaNick', ['nick' => $nick, 'id_cuestionario' => $cuestionarioOficial->id]) }}" class="panel-card-link">
+                        <div class="card panel-card">
+                            <div class="card-body">
+                                <i class="bi bi-clipboard2-pulse card-icon"></i>
+                                <span class="button-title">Cuestionario</span>
+                                <span class="button-description">Obtén recomendaciones personalizadas.</span>
+                            </div>
+                        </div>
+                    </a>
+                    @else
+                    <div class="card panel-card button-disabled">
+                        <div class="card-body">
+                            <i class="bi bi-clipboard2-x card-icon"></i>
+                            <span class="button-title">Cuestionario</span>
+                            <span class="button-description">No disponible actualmente.</span>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                {{-- LÍNEA CORREGIDA --}}
+                <div class="col-lg-4 col-md-6 col-sm-10">
+                    <a href="{{ route('user.peinadoscortes', ['nick' => $nick]) }}" class="panel-card-link">
+                        <div class="card panel-card">
+                            <div class="card-body">
+                                <i class="bi bi-scissors card-icon"></i>
+                                <span class="button-title">Peinados y Cortes</span>
+                                <span class="button-description">Inspírate para tu nuevo look. (En desarrollo)</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
         </div>
-        @endif
-
-        {{-- Botón 3: Peinados y Cortes de Pelo (Placeholder) --}}
-        <a href="{{ route('user.peinadoscortes', ['nick' => $nick]) }}" class="panel-button">
-            <span class="button-title">Peinados y Cortes</span>
-            <span class="button-description">Inspírate para tu nuevo look. (En desarrollo)</span>
-        </a>
-    </div>
+    </section>
 
     <footer class="site-footer">
-
+        <p>&copy; {{ date('Y') }} HairLife. Todos los derechos reservados.</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
