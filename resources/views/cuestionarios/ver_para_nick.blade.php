@@ -14,19 +14,31 @@
     <style>
         :root {
             --purple-primary: #6a0dad;
+            /* Morado principal (HairLife) */
             --purple-secondary: #8e44ad;
+            /* Morado secundario/más suave */
             --purple-dark: #4c0b56;
-            --purple-light-bg: #f8f5f9;
+            /* Morado oscuro para hovers/texto */
+            --purple-medium: #7952b3;
+            /* Un morado intermedio */
+            --purple-light: #c3a2d9;
+            /* Un lila más claro */
+            --purple-very-light: #e0cce8;
+            /* Un lila muy pálido para bordes o fondos sutiles */
+            --purple-background: #f8f5f9;
+            /* Fondo de página casi blanco con tinte lila */
+
             --text-on-purple: #ffffff;
             --card-bg: #ffffff;
-            --border-color: #e0cce8;
+            --border-color: var(--purple-very-light);
+            /* Borde general */
             --input-focus-color: var(--purple-secondary);
             --input-focus-box-shadow: rgba(142, 68, 173, 0.25);
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: var(--purple-light-bg);
+            background-color: var(--purple-background);
             color: #333;
             line-height: 1.6;
             padding-top: 80px;
@@ -42,7 +54,8 @@
         .home-button {
             background-color: var(--purple-primary);
             color: var(--text-on-purple);
-            border-color: var(--purple-dark);
+            border: 1px solid var(--purple-dark);
+            /* Borde más definido */
         }
 
         .home-button:hover,
@@ -52,11 +65,19 @@
             border-color: var(--purple-dark);
         }
 
+        .questionnaire-main-container {
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
         .questionnaire-container {
             background-color: var(--card-bg);
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(106, 13, 173, 0.15);
-            padding: 25px 30px;
+            border: 1px solid var(--border-color);
+            /* Borde sutil al contenedor principal */
+            box-shadow: 0 8px 24px rgba(106, 13, 173, 0.1);
+            /* Sombra más suave */
+            padding: 30px 35px;
             margin-bottom: 40px;
         }
 
@@ -64,37 +85,43 @@
             font-family: 'Dancing Script', cursive;
             color: var(--purple-primary);
             text-align: center;
-            font-size: 2.8em;
-            margin-bottom: 0.25rem;
+            font-size: 3em;
+            /* Un poco más grande */
+            margin-bottom: 0.5rem;
         }
 
         .questionnaire-subtitle {
             text-align: center;
-            color: #555;
-            margin-bottom: 20px;
-            font-size: 1.1em;
+            color: var(--purple-medium);
+            /* Usamos un morado intermedio */
+            margin-bottom: 25px;
+            font-size: 1.15em;
+            /* Un poco más grande */
         }
 
         .questionnaire-description {
             color: #444;
             font-size: 1em;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             padding-left: 15px;
-            border-left: 4px solid var(--purple-secondary);
+            border-left: 4px solid var(--purple-light);
+            /* Borde con lila claro */
         }
 
         .question-slider {
             position: relative;
             overflow: hidden;
-            min-height: 250px;
-            margin-bottom: 20px;
+            min-height: 350px;
+            /* Aumentamos un poco más la altura mínima */
+            margin-bottom: 25px;
         }
 
         .pregunta-bloque {
             background-color: #fdfaff;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--purple-very-light);
+            /* Borde más sutil con lila muy pálido */
             border-radius: 8px;
-            padding: 20px;
+            padding: 25px;
             width: 100%;
             position: absolute;
             top: 0;
@@ -103,6 +130,10 @@
             transform: translateX(100%);
             transition: transform 0.5s ease-in-out, opacity 0.4s ease-in-out;
             visibility: hidden;
+            /* max-height: 350px; Ya no es necesario aquí, el scroll va en el div de opciones */
+            display: flex;
+            flex-direction: column;
+            /* Para que el enunciado y las opciones se apilen */
         }
 
         .pregunta-bloque.active {
@@ -120,9 +151,57 @@
         .pregunta-enunciado {
             display: block;
             font-weight: 700;
-            margin-bottom: 18px;
-            color: var(--purple-dark);
-            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: var(--purple-primary);
+            /* Texto de la pregunta en morado principal */
+            font-size: 1.3em;
+            /* Un poco más grande */
+            flex-shrink: 0;
+            /* Evita que el enunciado se encoja si las opciones son muchas */
+        }
+
+        /* Contenedor para opciones con scroll */
+        .pregunta-opciones-scrollable {
+            overflow-y: auto;
+            /* Scroll vertical si es necesario */
+            max-height: 220px;
+            /* Altura máxima para el área de opciones (ajustar según necesidad) */
+            padding-right: 10px;
+            /* Espacio para la barra de scroll si aparece */
+            flex-grow: 1;
+            /* Ocupa el espacio restante */
+        }
+
+        /* Estilo para la barra de scroll (opcional, para Webkit/Blink) */
+        .pregunta-opciones-scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .pregunta-opciones-scrollable::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .pregunta-opciones-scrollable::-webkit-scrollbar-thumb {
+            background: var(--purple-light);
+            border-radius: 10px;
+        }
+
+        .pregunta-opciones-scrollable::-webkit-scrollbar-thumb:hover {
+            background: var(--purple-medium);
+        }
+
+        .form-check {
+            margin-bottom: 0.85rem !important;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            font-size: 1.05em;
+        }
+
+        .form-control {
+            font-size: 1em;
         }
 
         .form-check-input:checked {
@@ -143,10 +222,6 @@
             border-color: var(--border-color);
         }
 
-        .form-check-label {
-            cursor: pointer;
-        }
-
         .navigation-buttons {
             display: flex;
             justify-content: space-between;
@@ -156,6 +231,7 @@
         }
 
         .btn-nav {
+            /* Botones Anterior/Siguiente */
             background-color: var(--purple-secondary);
             border-color: var(--purple-secondary);
             min-width: 120px;
@@ -163,8 +239,16 @@
 
         .btn-nav:hover,
         .btn-nav:focus {
-            background-color: var(--purple-dark);
-            border-color: var(--purple-dark);
+            background-color: var(--purple-primary);
+            /* Hover más intenso */
+            border-color: var(--purple-primary);
+        }
+
+        .btn-nav:disabled {
+            /* Estilo para botón deshabilitado (Anterior) */
+            background-color: var(--purple-light);
+            border-color: var(--purple-light);
+            opacity: 0.7;
         }
 
         .btn-submit-final {
@@ -202,7 +286,7 @@
         </a>
     </div>
 
-    <div class="container mt-4">
+    <div class="questionnaire-main-container">
         <div class="questionnaire-container">
             <h1 class="questionnaire-title">{{ htmlspecialchars($cuestionario->titulo) }}</h1>
             <p class="questionnaire-subtitle">Respondiendo como: <strong>{{ htmlspecialchars($nick) }}</strong></p>
@@ -237,51 +321,55 @@
                             @endif
                         </label>
 
-                        @if ($pregunta->tipo_input === 'radio' && $pregunta->opciones->isNotEmpty())
-                        @foreach ($pregunta->opciones as $opcion)
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio"
-                                id="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}"
+                        {{-- Nuevo div para el contenido scrolleable de las opciones --}}
+                        <div class="pregunta-opciones-scrollable">
+                            @if ($pregunta->tipo_input === 'radio' && $pregunta->opciones->isNotEmpty())
+                            @foreach ($pregunta->opciones as $opcion)
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                    id="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}"
+                                    name="respuestas[{{ $pregunta->id }}]"
+                                    value="{{ $opcion->valor_opcion }}"
+                                    {{ old('respuestas.' . $pregunta->id) == $opcion->valor_opcion ? 'checked' : '' }}
+                                    @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
+                                >
+                                <label class="form-check-label" for="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}">
+                                    {{ htmlspecialchars($opcion->texto_opcion) }}
+                                </label>
+                            </div>
+                            @endforeach
+                            @elseif ($pregunta->tipo_input === 'checkbox' && $pregunta->opciones->isNotEmpty())
+                            @foreach ($pregunta->opciones as $opcion)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                    id="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}"
+                                    name="respuestas[{{ $pregunta->id }}][]"
+                                    value="{{ $opcion->valor_opcion }}"
+                                    {{ (is_array(old('respuestas.' . $pregunta->id)) && in_array($opcion->valor_opcion, old('respuestas.' . $pregunta->id, []))) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}">
+                                    {{ htmlspecialchars($opcion->texto_opcion) }}
+                                </label>
+                            </div>
+                            @endforeach
+                            @elseif ($pregunta->tipo_input === 'textarea')
+                            <textarea class="form-control"
+                                id="pregunta_{{ $pregunta->id }}"
                                 name="respuestas[{{ $pregunta->id }}]"
-                                value="{{ $opcion->valor_opcion }}"
-                                {{ old('respuestas.' . $pregunta->id) == $opcion->valor_opcion ? 'checked' : '' }}
+                                rows="5"
                                 @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
+                                    aria-describedby="error_pregunta_{{ $pregunta->id }}"
+                                >{{ old('respuestas.' . $pregunta->id) }}</textarea>
+                            @else
+                            <input type="text" class="form-control"
+                                id="pregunta_{{ $pregunta->id }}"
+                                name="respuestas[{{ $pregunta->id }}]"
+                                value="{{ old('respuestas.' . $pregunta->id) }}"
+                                @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
+                            aria-describedby="error_pregunta_{{ $pregunta->id }}"
                             >
-                            <label class="form-check-label" for="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}">
-                                {{ htmlspecialchars($opcion->texto_opcion) }}
-                            </label>
-                        </div>
-                        @endforeach
-                        @elseif ($pregunta->tipo_input === 'checkbox' && $pregunta->opciones->isNotEmpty())
-                        @foreach ($pregunta->opciones as $opcion)
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox"
-                                id="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}"
-                                name="respuestas[{{ $pregunta->id }}][]"
-                                value="{{ $opcion->valor_opcion }}"
-                                {{ (is_array(old('respuestas.' . $pregunta->id)) && in_array($opcion->valor_opcion, old('respuestas.' . $pregunta->id, []))) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}">
-                                {{ htmlspecialchars($opcion->texto_opcion) }}
-                            </label>
-                        </div>
-                        @endforeach
-                        @elseif ($pregunta->tipo_input === 'textarea')
-                        <textarea class="form-control"
-                            id="pregunta_{{ $pregunta->id }}"
-                            name="respuestas[{{ $pregunta->id }}]"
-                            rows="4"
-                            @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
-                                aria-describedby="error_pregunta_{{ $pregunta->id }}"
-                            >{{ old('respuestas.' . $pregunta->id) }}</textarea>
-                        @else
-                        <input type="text" class="form-control"
-                            id="pregunta_{{ $pregunta->id }}"
-                            name="respuestas[{{ $pregunta->id }}]"
-                            value="{{ old('respuestas.' . $pregunta->id) }}"
-                            @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
-                        aria-describedby="error_pregunta_{{ $pregunta->id }}"
-                        >
-                        @endif
+                            @endif
+                        </div> {{-- Fin de .pregunta-opciones-scrollable --}}
+
 
                         @error('respuestas.' . $pregunta->id)
                         <div class="error-text mt-2" id="error_pregunta_{{ $pregunta->id }}">{{ $message }}</div>
@@ -313,6 +401,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // El JavaScript permanece igual que en la versión anterior que funcionaba
         document.addEventListener('DOMContentLoaded', function() {
             const bloquesDePregunta = document.querySelectorAll('.pregunta-bloque');
             const botonAnterior = document.getElementById('botonPreguntaAnterior');
@@ -330,7 +419,6 @@
             }
 
             function prepararBloquesNoActivos() {
-                // Sintaxis de flecha: (bloque, indice) => { ... }
                 bloquesDePregunta.forEach((bloque, indice) => {
                     if (indice !== indicePreguntaActual) {
                         bloque.style.transform = indice < indicePreguntaActual ? 'translateX(-100%)' : 'translateX(100%)';
@@ -400,7 +488,6 @@
                     bloqueActualDOM.style.opacity = '0';
                     bloqueActualDOM.classList.remove('active');
 
-                    // Sintaxis de flecha: () => { ... }
                     const handler = () => {
                         bloqueActualDOM.style.visibility = 'hidden';
                         bloqueActualDOM.removeEventListener('transitionend', handler);
@@ -408,7 +495,6 @@
                     bloqueActualDOM.addEventListener('transitionend', handler);
                 }
 
-                // Sintaxis de flecha: () => { ... }
                 requestAnimationFrame(() => {
                     if (bloqueNuevoDOM) {
                         bloqueNuevoDOM.style.visibility = 'visible';
@@ -423,7 +509,6 @@
             }
 
             if (botonSiguiente) {
-                // Sintaxis de flecha: () => { ... }
                 botonSiguiente.addEventListener('click', () => {
                     if (indicePreguntaActual < totalDePreguntas - 1) {
                         mostrarPregunta(indicePreguntaActual + 1);
@@ -432,7 +517,6 @@
             }
 
             if (botonAnterior) {
-                // Sintaxis de flecha: () => { ... }
                 botonAnterior.addEventListener('click', () => {
                     if (indicePreguntaActual > 0) {
                         mostrarPregunta(indicePreguntaActual - 1);
@@ -440,14 +524,12 @@
                 });
             }
 
-            // --- INICIO DE LA SECCIÓN DE CONFIGURACIÓN INICIAL ---
             const hayErroresLaravel = "{{ $errors->any() ? 'true' : 'false' }}";
             let preguntaInicial = 0;
 
             if (hayErroresLaravel) {
                 let errorEncontrado = false;
                 if (bloquesDePregunta && bloquesDePregunta.length > 0) {
-                    // Sintaxis de flecha: (bloque, indice) => { ... }
                     bloquesDePregunta.forEach((bloque, indice) => {
                         if (!errorEncontrado && bloque.querySelector('.error-text')) {
                             preguntaInicial = indice;
@@ -456,7 +538,6 @@
                     });
                 }
             }
-            // --- FIN DE LA SECCIÓN DE CONFIGURACIÓN INICIAL ---
 
             if (totalDePreguntas > 0) {
                 prepararBloquesNoActivos();
@@ -468,3 +549,6 @@
 
         });
     </script>
+</body>
+
+</html>
