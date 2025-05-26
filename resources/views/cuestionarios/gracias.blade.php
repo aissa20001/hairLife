@@ -4,67 +4,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Gracias por tu participación! - Mi Pelo</title>
+    <title>¡Gracias por tu participación! - HairLife</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            /* Paleta de Morados con Nombres de Colores */
+            --purple-primary: RebeccaPurple;
+            /* Original: #6a0dad (RebeccaPurple es #663399) */
+            --purple-secondary: MediumPurple;
+            /* Original: #8e44ad (MediumPurple es #9370DB) */
+            --purple-dark: Indigo;
+            /* Original: #4c0b56 (Indigo es #4B0082) */
+            --purple-medium: MediumSlateBlue;
+            /* Original: #7952b3 (MediumSlateBlue es #7B68EE) */
+            --purple-light: Thistle;
+            /* Original: #c3a2d9 (Thistle es #D8BFD8) */
+            --purple-very-light: Lavender;
+            /* Original: #e0cce8 (Lavender es #E6E6FA) */
+            --purple-background: GhostWhite;
+            /* Original: #f8f5f9 (GhostWhite es #F8F8FF) */
+
+            /* Otros colores base */
+            --text-on-purple: white;
+            --card-bg: white;
+
+            /* Variables que dependen de las anteriores */
+            --border-color: var(--purple-very-light);
+
+            /* Sombra elegante - RGB de RebeccaPurple (102, 51, 153) */
+            --card-shadow-elegant: rgba(102, 51, 153, 0.18);
+
+            /* Variables de foco (usan variables de color morado) */
+            --input-focus-color: var(--purple-secondary);
+            --input-focus-box-shadow: rgba(147, 112, 219, 0.25);
+            /* RGB de MediumPurple (147, 112, 219) */
+        }
+
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #e9ecef;
-            color: #333;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--purple-background);
+            color: #495057;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 95vh;
+            min-height: 100vh;
+            padding: 20px;
             text-align: center;
+            box-sizing: border-box;
         }
 
-        .container {
-            padding: 35px 45px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 550px;
+        .gracias-container {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 35px var(--card-shadow-elegant);
+            max-width: 650px;
+            width: 100%;
+            padding: 50px 40px;
         }
 
-        .icon {
-            font-size: 4rem;
-            color: #28a745;
+        .gracias-icon {
+            font-size: 5.5rem;
+            color: var(--purple-primary);
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        .gracias-container h1 {
+            font-family: 'Dancing Script', cursive;
+            color: var(--purple-dark);
+            font-size: 3rem;
             margin-bottom: 20px;
         }
 
-        h1 {
-            color: #343a40;
-            font-size: 2em;
-            margin-bottom: 15px;
+        .gracias-container p {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            color: #5a6268;
         }
 
-        p {
-            color: #495057;
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 25px;
+        .gracias-container p.session-success {
+            color: var(--purple-medium);
+            font-weight: 500;
         }
 
-        /* Estilos para el loader */
         .loader-container {
             display: none;
-            /* Oculto por defecto, se muestra si hay recomendacionId */
-            padding: 20px;
+            padding: 20px 0;
             text-align: center;
         }
 
         .loader {
             border: 8px solid #f3f3f3;
-            /* Light grey */
-            border-top: 8px solid #7952b3;
-            /* Tu color principal o el que prefieras */
+            border-top: 8px solid var(--purple-primary);
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             animation: spin 1.5s linear infinite;
-            margin: 20px auto;
+            margin: 25px auto;
         }
 
         @keyframes spin {
@@ -78,72 +122,67 @@
         }
 
         .loading-text {
-            font-size: 1.2em;
-            color: #5a3d8a;
-            /* Un tono más oscuro de tu color principal */
+            font-size: 1.3em;
+            color: var(--purple-secondary);
+            font-weight: 500;
         }
 
-        .btn-home {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+        .btn-purple-home {
+            background-color: var(--purple-primary);
+            color: var(--text-on-purple);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
         }
 
-        .btn-home:hover {
-            background-color: #5a6268;
+        .btn-purple-home:hover,
+        .btn-purple-home:focus {
+            background-color: var(--purple-dark);
+            color: var(--text-on-purple);
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="icon">&#10004;</div>
+    <div class="gracias-container">
+        <i class="bi bi-check-circle-fill gracias-icon"></i>
         <h1>¡Cuestionario Enviado!</h1>
 
         @if (session('success'))
-        <p>{{ session('success') }}</p>
+        <p class="session-success">{{ session('success') }}</p>
         @else
-        <p>Gracias por completar nuestro cuestionario.</p>
+        <p>Gracias por completar nuestro cuestionario y dedicar tu tiempo.</p>
         @endif
 
         {{-- Contenedor del Loader y mensaje de redirección --}}
-        {{-- Comprueba si la variable $recomendacionId existe y no es null --}}
         @if (isset($recomendacionId) && $recomendacionId !== null)
         <div class="loader-container" id="loaderContainer">
             <div class="loader"></div>
             <p class="loading-text">Estamos preparando tu recomendación personalizada...</p>
         </div>
         @else
-        <p>Revisaremos tus respuestas. ¡Gracias por tu tiempo!</p>
-        {{-- Enlace para volver si no hay recomendación automática --}}
-        <a href="{{ route('crear.nick') }}" class="btn-home">Volver al inicio</a>
+        <p>Revisaremos tus respuestas con atención.</p>
+        <a href="{{ route('crear.nick') }}" class="btn btn-lg btn-purple-home mt-3">Volver al inicio</a>
         @endif
     </div>
 
-    {{-- Solo ejecuta el script de redirección si $recomendacionId está presente y tiene valor --}}
     @if (isset($recomendacionId) && $recomendacionId !== null)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mostrar el loader
             var loaderContainer = document.getElementById('loaderContainer');
             if (loaderContainer) {
                 loaderContainer.style.display = 'block';
             }
 
-            // Redirigir después de 5 segundos
             setTimeout(function() {
-                // Redirige a la ruta que mostrará la recomendación.
-                // Esta ruta la definiremos en el siguiente paso (Fase 3).
-                // El nombre de la ruta será 'recomendacion.ver' y le pasamos el $recomendacionId.
                 window.location.href = "{{ route('recomendacion.ver_producto', ['id' => $recomendacionId]) }}";
-            }, 5000); // 5000 milisegundos = 5 segundos
+            }, 5000); // 5 segundos
         });
     </script>
     @endif
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
