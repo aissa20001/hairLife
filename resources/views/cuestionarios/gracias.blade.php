@@ -48,7 +48,7 @@
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--purple-background);
-            color: #495057;
+            color: darkslategrey;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -57,6 +57,34 @@
             padding: 20px;
             text-align: center;
             box-sizing: border-box;
+            position: relative;
+            z-index: 0;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            /* Cubre toda la ventana y se queda fijo */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            /* Ancho completo de la ventana */
+            height: 100vh;
+            /* Alto completo de la ventana */
+
+            background-image: url('/storage/imagenes/fondo.jpg');
+            /* ¡Asegúrate que esta ruta sea correcta! */
+            background-repeat: repeat;
+            background-size: 250px;
+            /* Ajusta el tamaño del patrón como desees */
+
+            opacity: 0.2;
+            /* Opacidad solicitada. Ajusta si 0.6 era lo que querías (más visible) */
+
+            z-index: -1;
+            /* Se coloca detrás de todo el contenido del body */
+            pointer-events: none;
+            /* Para asegurar que no interfiera con clics u otras interacciones */
         }
 
         .gracias-container {

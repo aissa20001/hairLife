@@ -15,10 +15,35 @@ use Illuminate\Support\Facades\Auth; // Para la autenticación, si la usas
 use Illuminate\Support\Facades\Validator; // Para validar los datos del formulario
 
 class CuestionarioController extends Controller
-{
-    // ... (el método listar permanece igual) ...
-    // ... (el método mostrarParaNick permanece igual) ...
+{   //Obtiene todos los cuestionarios activos 
+    public function listar()
+    {
+        $cuestionarios = Cuestionario::where('estado', 'ACTIVO')->orderBy('titulo')->get();
+        return view('cuestionarios.listar', ['cuestionarios' => $cuestionarios]);
+    }
 
+
+    /**
+     * Muestra un cuestionario específico con sus preguntas.
+     * Recibe un nickname y el id del cuestionario.
+     * El parámetro $id_cuestionario viene de la URL.
+     */
+
+    public function mostrarParaNick($nick, $id_cuestionario)
+    {
+        // Busca el cuestionario por su ID. Si no lo encuentra o no está ACTIVO, muestra un error .
+        $cuestionario = Cuestionario::where('id', $id_cuestionario)->where('estado', 'ACTIVO')->firstOrFail();
+
+        // Carga las preguntas asociadas a este cuestionario, ordenadas por el campo 'numero' de la tabla pivote.
+        $preguntas = $cuestionario->preguntas()->with('opciones')->get();
+
+        // Pasa el cuestionario y sus preguntas a la vista 'cuestionarios.ver_para_nick'
+        return view('cuestionarios.ver_para_nick', [
+            'nick' => $nick,
+            'cuestionario' => $cuestionario,
+            'preguntas' => $preguntas
+        ]);
+    }
     /**
      * Procesa el envío de un formulario de cuestionario.
      * $id_cuestionario viene de la URL.
@@ -26,15 +51,17 @@ class CuestionarioController extends Controller
      */
     public function procesarEnvioParaNick(Request $request, $nick, $id_cuestionario)
     {
-        $cuestionario = Cuestionario::findOrFail($id_cuestionario); // Asegurar que existe
+        $cuestionario = Cuestionario::findOrFail($id_cuestionario); // Asegura que existe
         $preguntasDelCuestionario = $cuestionario->preguntas()->with('opciones')->get();
 
         // --- Validación ---
         $rules = [];
         $messages = [];
         foreach ($preguntasDelCuestionario as $pregunta) {
+            //Si la pregunta es tipo checkbox, acepta varias opciones.
             if ($pregunta->tipo_input === 'checkbox') {
                 $rules['respuestas.' . $pregunta->id] = 'nullable|array'; // Permite no enviar nada si no es obligatorio, o espera un array
+                //Para otros tipos (radio, text, textarea), se marcan como obligatorias.
             } else { // text, radio, textarea
                 $rules['respuestas.' . $pregunta->id] = 'required';
                 $messages['respuestas.' . $pregunta->id . '.required'] = 'La pregunta "' . htmlspecialchars(Str::limit($pregunta->enunciado, 50)) . '" es obligatoria.';
@@ -42,17 +69,17 @@ class CuestionarioController extends Controller
         }
 
         $validator = Validator::make($request->all(), $rules, $messages);
-
+        //Si la validación falla, redirige de nuevo a la vista del cuestionario con errores y los datos anteriores (withInput()).
         if ($validator->fails()) {
             return redirect()->route('cuestionarios.mostrarParaNick', ['nick' => $nick, 'id_cuestionario' => $id_cuestionario])
                 ->withErrors($validator)
                 ->withInput();
         }
-        // --- Fin Validación ---
-
+        //Busca al usuario por su Nombre (que es el nick).
         $usuario = Usuario::where('Nombre', $nick)->first();
+        //Obtiene su Codigo, que se guarda con el envío.
         $usuarioCodigo = $usuario ? $usuario->Codigo : null;
-
+        //Crea un nuevo registro en la tabla cuestionario_envios, que sirve como "formulario enviado".
         $envio = CuestionarioEnvio::create([
             'usuario_codigo' => $usuarioCodigo,
             'cuestionario_id' => $id_cuestionario,
@@ -79,12 +106,9 @@ class CuestionarioController extends Controller
             }
         }
 
-        // --- INICIO: Lógica de Recomendación MEJORADA ---
-        $productoRecomendado = null;
         $recomendacionCreada = null;
         $justificacionDetalle = "Hemos seleccionado este producto basado en tus respuestas generales.";
-
-        // 1. Obtener respuesta para "¿Qué producto quieres que te recomendemos?"
+        /* Al ser un prototipo las recomendaciones estan basadas a raiz de dos preguntas  la primera es el tipo de producto, y la otra es el tipo de pelo*/
         // Busca el objeto Pregunta por su enunciado exacto.
         $preguntaCategoriaProductoObj = Pregunta::where('enunciado', '¿Qué producto quieres que te recomendemos?')->first();
         $idPreguntaCategoriaProducto = $preguntaCategoriaProductoObj ? $preguntaCategoriaProductoObj->id : null;
@@ -145,10 +169,6 @@ class CuestionarioController extends Controller
                     $keywordParaDescripcion = null; // Evita que se aplique el where de abajo si ya se manejó aquí
                     break;
             }
-
-            if ($keywordParaDescripcion) { // Solo si no fue manejado por el caso 'muy_rizado_afro'
-                $queryProducto->where('descripcion', 'LIKE', '%' . $keywordParaDescripcion . '%');
-            }
         }
 
         // Intentar encontrar un producto con los filtros aplicados, eligiendo uno al azar si hay varios
@@ -207,7 +227,7 @@ class CuestionarioController extends Controller
                 'justificacion_detalle' => $justificacionDetalle,
             ]);
         }
-        // --- FIN: Lógica de Recomendación MEJORADA ---
+
 
         if ($recomendacionCreada) {
             return redirect()->route('cuestionarios.gracias', ['nick' => $nick, 'recomendacionId' => $recomendacionCreada->id])

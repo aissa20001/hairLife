@@ -12,7 +12,7 @@ class HomeController extends Controller
     {
         // Busca al usuario por su 'Nombre' que viene en la URL
         $usuario = Usuario::where('Nombre', $nickDeURL)->firstOrFail();
-
+        // Busca el primer cuestionario activo, ordenado por su id
         $cuestionarioOficial = Cuestionario::where('estado', 'ACTIVO')->orderBy('id')->first();
 
         // La vista se llama 'user_dashboard.show'
@@ -41,13 +41,5 @@ class HomeController extends Controller
     {
         // Asegúrate que la vista 'user_dashboard.peinados_cortes' existe
         return view('user_dashboard.peinados_cortes', ['nick' => $nick]);
-    }
-
-    /**
-     * (Opcional) Método para la ruta '/' si lo manejas aquí.
-     */
-    public function index()
-    {
-        return view('welcome'); // O redirigir a login/crear nick
     }
 }

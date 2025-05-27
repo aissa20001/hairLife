@@ -44,6 +44,35 @@
             color: #495057;
             padding-top: 80px;
             line-height: 1.7;
+            position: relative;
+            min-height: 100vh;
+            z-index: 0;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            /* Cubre toda la ventana y se queda fijo */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            /* Ancho completo de la ventana */
+            height: 100vh;
+            /* Alto completo de la ventana */
+
+            background-image: url('/storage/imagenes/fondo.jpg');
+            /* ¡Asegúrate que esta ruta sea correcta! */
+            background-repeat: repeat;
+            background-size: 250px;
+            /* Ajusta el tamaño del patrón como desees */
+
+            opacity: 0.2;
+            /* Opacidad solicitada. Ajusta si 0.6 era lo que querías (más visible) */
+
+            z-index: -1;
+            /* Se coloca detrás de todo el contenido del body */
+            pointer-events: none;
+            /* Para asegurar que no interfiera con clics u otras interacciones */
         }
 
         .home-button-container {
@@ -57,6 +86,12 @@
             background-color: var(--purple-primary);
             color: var(--text-on-purple);
             border: 1px solid var(--purple-dark);
+            padding: 0.5rem 0.9rem;
+            font-size: 1.2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2),
+                0 0 0 2px rgba(var(--text-on-purple), 0.2);
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
         }
 
         .home-button:hover,
@@ -64,6 +99,10 @@
             background-color: var(--purple-dark);
             color: var(--text-on-purple);
             border-color: var(--purple-dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3),
+                0 0 0 2px rgba(var(--text-on-purple), 0.3);
+            transform: translateY(-2px);
+
         }
 
         .product-view-container {
@@ -85,7 +124,7 @@
         .product-header .product-name {
             font-family: 'Dancing Script', cursive;
             color: var(--purple-dark);
-            font-size: 2.8rem;
+            font-size: 3.5rem;
             margin-bottom: 10px;
         }
 
@@ -111,7 +150,7 @@
             border-radius: 10px;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-            max-height: 400px;
+            max-height: 300px;
         }
 
         .section-title {
@@ -185,14 +224,33 @@
 
 <body>
     <div class="home-button-container">
-        <a href="{{ session('usuario_nombre') ? route('user.dashboard', ['nick' => session('usuario_nombre')]) : route('crear.nick') }}" class="btn home-button" title="Volver al Panel">
+        <?php
+        $homeLink = route('crear.nick'); // Fallback por defecto si no hay sesión o datos necesarios
+        $userNick = session('usuario_nombre');
+
+        // Se asume que $id_cuestionario_actual y $id_pregunta_filtro son pasados desde RecomendacionController
+        // Si no existen (porque no se implementó la opción dinámica o falló), se usarán los fallbacks.
+        if ($userNick && isset($id_cuestionario_actual) && $id_cuestionario_actual && isset($id_pregunta_filtro) && $id_pregunta_filtro) {
+            // Construye el enlace a la pregunta específica del cuestionario
+            $homeLink = route('cuestionarios.mostrarParaNick', [
+                'nick' => $userNick,
+                'id_cuestionario' => $id_cuestionario_actual
+            ]) . '#pregunta-' . $id_pregunta_filtro; // Añade el ancla para la pregunta
+        } elseif ($userNick) {
+            // Si faltan datos del cuestionario/pregunta pero hay sesión, va al dashboard del usuario
+            $homeLink = route('user.dashboard', ['nick' => $userNick]);
+        }
+        // Si $userNick no está definido, $homeLink sigue siendo route('crear.nick') como se definió inicialmente
+        ?>
+
+        <a href="{{ $homeLink }}" class="btn home-button" title="Volver al cuestionario para elegir otra categoría">
             <i class="bi bi-house-fill"></i>
         </a>
     </div>
 
     <div class="product-view-container">
         <div class="product-header">
-            <h1 class="product-name">{{ htmlspecialchars($producto->nombre) }}</h1>
+            <h1 class="product-name">{{ $producto->nombre }}</h1>
             <p class="product-brand-category">
                 <strong>Marca:</strong> {{ htmlspecialchars($producto->marca) }} |
                 <strong>Categoría:</strong> {{ htmlspecialchars(ucfirst($producto->categoria)) }}
@@ -201,8 +259,9 @@
 
         @if($producto->foto)
         <div class="product-image-container">
-            <img src="{{ filter_var($producto->foto, FILTER_VALIDATE_URL) ? $producto->foto : asset('storage/' . $producto->foto) }}"
-                alt="Foto de {{ htmlspecialchars($producto->nombre) }}" class="product-image img-fluid">
+            <img src="{{ asset('storage/' . $producto->foto) }}"
+                alt="Foto de {{ $producto->nombre }}"
+                class="product-image img-fluid">
         </div>
         @else
         <p class="text-center fst-italic text-muted">(Imagen no disponible)</p>
@@ -221,24 +280,15 @@
         </div>
         @endif
 
-        {{-- SECCIÓN DE JUSTIFICACIÓN ELIMINADA --}}
-        {{-- @if($recomendacion->justificacion_titulo || $recomendacion->justificacion_detalle)
-        <div class="justification">
-            <h3>{{ htmlspecialchars($recomendacion->justificacion_titulo ?: 'Nuestra Sugerencia Para Ti') }}</h3>
-        @if($recomendacion->justificacion_detalle)
-        <p>{!! nl2br(e($recomendacion->justificacion_detalle)) !!}</p>
-        @endif
-    </div>
-    @endif --}}
 
-    <div class="navigation-links-footer">
-        @if (session('usuario_nombre'))
-        <a href="{{ route('user.dashboard', ['nick' => session('usuario_nombre')]) }}">Volver a Mi Panel</a>
-        @else
-        <a href="{{ route('crear.nick') }}">Ir al Inicio</a>
-        @endif
-        <a href="{{ route('login') }}">Comenzar de Nuevo</a>
-    </div>
+        <div class="navigation-links-footer">
+            @if (session('usuario_nombre'))
+            <a href="{{ route('user.dashboard', ['nick' => session('usuario_nombre')]) }}">Volver a Mi Panel</a>
+            @else
+            <a href="{{ route('crear.nick') }}">Ir al Inicio</a>
+            @endif
+            <a href="{{ route('login') }}">Comenzar de Nuevo</a>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
