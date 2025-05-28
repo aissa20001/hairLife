@@ -37,12 +37,21 @@ class LoginController extends Controller
             } elseif ($usuario->Rol == 0) { // Usuario normal
                 // Redirige al panel usando el 'Nombre' del usuario
                 // como el parámetro 'nick' para la ruta 'user.dashboard'.
-                $urlDestino = route('user.dashboard', ['nick' => $usuario->Nombre]);
+                $dashboardUrl = route('user.dashboard', ['nick' => $usuario->Nombre]);
+
 
 
                 if (!$usuario->nick) {
+                    // Si no tiene nick, necesita completar el nick de display
                     session(['necesita_completar_nick_display' => true]);
+                    // Guardamos la URL del dashboard a la que deberá ir DESPUÉS de crear el nick
+                    session(['url_intended_after_nick' => $dashboardUrl]);
+                    // Redirigimos a la página de creación de nick
+                    return redirect()->route('crear.nick')
+                        ->with('info', 'Por favor, elige un nick para tu perfil.');
                 }
+                // Si ya tiene nick, va directamente al dashboard
+                $urlDestino = $dashboardUrl;
             }
             return redirect($urlDestino);
         }

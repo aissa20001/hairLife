@@ -102,7 +102,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 109%;
+            height: 105%;
 
             background-image: url('/storage/imagenes/fondo.jpg');
             /* ¡ESTA ES LA RUTA CORRECTA! */
@@ -362,7 +362,9 @@
 <body>
 
     <header class="header-panel">
-        <h1>¡Hola, {{$nick}}!</h1>
+        <h1>
+            <h1>¡Hola, {{empty($displayNick) ? $nick : $displayNick }}!</h1>
+        </h1>
         <p>Bienvenid@ a tu espacio en HairLife</p>
     </header>
 
