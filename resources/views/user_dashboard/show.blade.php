@@ -362,7 +362,7 @@
 <body>
 
     <header class="header-panel">
-        <h1>¡Hola, {{ htmlspecialchars($nick) }}!</h1>
+        <h1>¡Hola, {{$nick}}!</h1>
         <p>Bienvenid@ a tu espacio en HairLife</p>
     </header>
 

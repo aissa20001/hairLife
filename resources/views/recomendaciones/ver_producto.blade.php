@@ -184,15 +184,21 @@
             padding: 12px 30px;
             font-size: 1.1rem;
             font-weight: 500;
-            transition: background-color 0.2s ease-in-out, transform 0.2s ease;
-            border-radius: 8px;
+            border-radius: 0.5rem;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2),
+                0 0 0 2px rgba(var(--text-on-purple), 0.2);
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
         }
 
         .btn-purchase:hover,
         .btn-purchase:focus {
             background-color: var(--purple-dark);
             color: var(--text-on-purple);
+            border-color: var(--purple-dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3),
+                0 0 0 2px rgba(var(--text-on-purple), 0.3);
             transform: translateY(-2px);
+
         }
 
         /* Se eliminaron los estilos .justification, .justification h3, .justification p */
@@ -254,7 +260,7 @@
         ?>
 
         <a href="{{ $homeLink }}" class="btn home-button" title="Volver al cuestionario para elegir otra categoría">
-            <i class="bi bi-house-fill"></i>
+            <i class="bi bi-clipboard2-pulse "></i>
         </a>
     </div>
 
