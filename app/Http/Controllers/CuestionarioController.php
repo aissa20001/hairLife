@@ -29,7 +29,7 @@ class CuestionarioController extends Controller
      * El parámetro $id_cuestionario viene de la URL.
      */
 
-    public function mostrarParaNick($nick, $id_cuestionario)
+    public function mostrarParaNick(Request $request, $nick, $id_cuestionario)
     {
         // Busca el cuestionario por su ID. Si no lo encuentra o no está ACTIVO, muestra un error .
         $cuestionario = Cuestionario::where('id', $id_cuestionario)->where('estado', 'ACTIVO')->firstOrFail();
@@ -37,11 +37,47 @@ class CuestionarioController extends Controller
         // Carga las preguntas asociadas a este cuestionario, ordenadas por el campo 'numero' de la tabla pivote.
         $preguntas = $cuestionario->preguntas()->with('opciones')->get();
 
+        // Obtener el ID de la pregunta filtro para no rellenarla desde previousAnswers
+        $preguntaFiltroObj = Pregunta::where('enunciado', '¿Qué producto quieres que te recomendemos?')->first();
+        $idPreguntaFiltroAExcluir = $preguntaFiltroObj ? $preguntaFiltroObj->id : null;
+
+
+        $respuestasPreviasFormateadas = [];
+
+        $envioPrevioId = $request->query('envio_previo');
+
+
+        if ($envioPrevioId) {
+            // Cargar el envío previo con sus respuestas y la pregunta asociada a cada respuesta
+            // para determinar el tipo de input (especialmente para checkboxes)
+            $envioPrevio = CuestionarioEnvio::with('respuestas.pregunta')->find($envioPrevioId);
+            if ($envioPrevio && $envioPrevio->cuestionario_id == $id_cuestionario) {
+                foreach ($envioPrevio->respuestas as $respuesta) {
+                    $preguntaId = $respuesta->id_preguntas;
+                    $valorRespuesta = $respuesta->valor_pregunta;
+                    // Verificar si la pregunta original existe y su tipo
+                    $tipoInput = $respuesta->pregunta ? $respuesta->pregunta->tipo_input : null;
+
+                    if ($tipoInput === 'checkbox') {
+                        if (!isset($respuestasPreviasFormateadas[$preguntaId])) {
+                            $respuestasPreviasFormateadas[$preguntaId] = [];
+                        }
+                        $respuestasPreviasFormateadas[$preguntaId][] = $valorRespuesta;
+                    } else {
+                        $respuestasPreviasFormateadas[$preguntaId] = $valorRespuesta;
+                    }
+                }
+            }
+        }
+
+
         // Pasa el cuestionario y sus preguntas a la vista 'cuestionarios.ver_para_nick'
         return view('cuestionarios.ver_para_nick', [
             'nick' => $nick,
             'cuestionario' => $cuestionario,
-            'preguntas' => $preguntas
+            'preguntas' => $preguntas,
+            'previousAnswers' => $respuestasPreviasFormateadas,
+            'idPreguntaFiltro' => $idPreguntaFiltroAExcluir, // Pasar el ID de la pregunta filtro
         ]);
     }
     /**

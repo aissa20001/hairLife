@@ -228,14 +228,24 @@
         $homeLink = route('crear.nick'); // Fallback por defecto si no hay sesión o datos necesarios
         $userNick = session('usuario_nombre');
 
+        $queryParams = [];
+        if (isset($envio_id_para_link_cuestionario) && $envio_id_para_link_cuestionario) {
+            $queryParams['envio_previo'] = $envio_id_para_link_cuestionario;
+        }
+
         // Se asume que $id_cuestionario_actual y $id_pregunta_filtro son pasados desde RecomendacionController
         // Si no existen (porque no se implementó la opción dinámica o falló), se usarán los fallbacks.
         if ($userNick && isset($id_cuestionario_actual) && $id_cuestionario_actual && isset($id_pregunta_filtro) && $id_pregunta_filtro) {
             // Construye el enlace a la pregunta específica del cuestionario
-            $homeLink = route('cuestionarios.mostrarParaNick', [
-                'nick' => $userNick,
-                'id_cuestionario' => $id_cuestionario_actual
-            ]) . '#pregunta-' . $id_pregunta_filtro; // Añade el ancla para la pregunta
+            //// Construye el enlace con los query params y el ancla con el array_merge
+            $homeLink = route('cuestionarios.mostrarParaNick', array_merge(
+                [
+                    'nick' => $userNick,
+                    'id_cuestionario' => $id_cuestionario_actual
+                ],
+                $queryParams
+
+            )) . '#pregunta-' . $id_pregunta_filtro; // Añade el ancla para la pregunta
         } elseif ($userNick) {
             // Si faltan datos del cuestionario/pregunta pero hay sesión, va al dashboard del usuario
             $homeLink = route('user.dashboard', ['nick' => $userNick]);

@@ -40,19 +40,23 @@ class RecomendacionController extends Controller
         }
         // Obtener el ID del Cuestionario desde el envio de la recomendación
         $id_cuestionario_actual = null;
+        $envio_id_para_link = null;
         if ($recomendacion->envio) {
             $id_cuestionario_actual = $recomendacion->envio->cuestionario_id; //
+            $envio_id_para_link = $recomendacion->envio->id; // Se asigna el ID del envío
         }
 
         // Obtener el ID de la pregunta específica "¿Qué producto quieres que te recomendemos?"
         $preguntaFiltroObj = Pregunta::where('enunciado', '¿Qué producto quieres que te recomendemos?')->first(); //
         $id_pregunta_filtro = $preguntaFiltroObj ? $preguntaFiltroObj->id : null;
         // Pasa la recomendación y el producto a la vista
+
         return view('recomendaciones.ver_producto', [
             'recomendacion' => $recomendacion,
             'producto' => $recomendacion->producto,
             'id_cuestionario_actual' => $id_cuestionario_actual, // Variable para el ID del cuestionario
-            'id_pregunta_filtro' => $id_pregunta_filtro       // Variable para el ID de la pregunta filtro
+            'id_pregunta_filtro' => $id_pregunta_filtro,      // Variable para el ID de la pregunta filtro
+            'envio_id_para_link_cuestionario' => $envio_id_para_link, // Pasa la variable a la vista
         ]);
     }
 }

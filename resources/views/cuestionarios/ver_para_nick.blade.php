@@ -332,7 +332,7 @@
             <h1 class="questionnaire-title">{{ htmlspecialchars($cuestionario->titulo) }}</h1>
             <p class="questionnaire-subtitle">Respondiendo como: <strong>{{ htmlspecialchars($nick) }}</strong></p>
 
-            @if(!empty($cuestionario->descripcion)) {{-- Simplificado: !empty cubre isset y no vacío --}}
+            @if(!empty($cuestionario->descripcion))
             <p class="questionnaire-description">{{ htmlspecialchars($cuestionario->descripcion) }}</p>
             @endif
 
@@ -347,16 +347,27 @@
             </div>
             @endif
 
+            @php
+            // Estas variables vienen del controlador
+            $previousAnswers = $previousAnswers ?? [];
+            $idPreguntaFiltro = $idPreguntaFiltro ?? null; // ID de la pregunta a no rellenar
+            @endphp
+
             <form method="POST" action="{{ route('cuestionarios.enviarParaNick', ['nick' => $nick, 'id_cuestionario' => $cuestionario->id]) }}" id="formularioCuestionarioInteractivo">
                 @csrf
 
                 @if($preguntas->isEmpty())
-                <p class="text-center my-5">Este cuestionario aún no tiene preguntas configuradas. Por favor, contacta al administrador.</p>
+                <p class="text-center my-5">Este cuestionario aún no tiene preguntas configuradas.</p>
                 @else
                 <div class="question-slider">
                     @foreach ($preguntas as $index => $pregunta)
+                    @php
+                    // Determinar si esta pregunta debe usar las respuestas previas o solo old()
+                    $usarRespuestaPrevia = ($pregunta->id != $idPreguntaFiltro && isset($previousAnswers[$pregunta->id]));
+                    $valorOld = old('respuestas.' . $pregunta->id);
+                    @endphp
                     <div class="pregunta-bloque" id="pregunta-{{ $pregunta->id }}" data-pregunta-id="{{ $pregunta->id }}">
-                        <label class="pregunta-enunciado mb-3">{{ $loop->iteration }}. {{ $pregunta->enunciado }}
+                        <label class="pregunta-enunciado mb-3">{{ $loop->iteration }}. {{ htmlspecialchars($pregunta->enunciado) }}
                             @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required'))
                             <span class="text-danger">*</span>
                             @endif
@@ -370,8 +381,12 @@
                                     id="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}"
                                     name="respuestas[{{ $pregunta->id }}]"
                                     value="{{ $opcion->valor_opcion }}"
-                                    {{ old('respuestas.' . $pregunta->id) == $opcion->valor_opcion ? 'checked' : '' }}
-                                    @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
+                                    @if($usarRespuestaPrevia && $previousAnswers[$pregunta->id] == $opcion->valor_opcion)
+                                checked
+                                @elseif(!$usarRespuestaPrevia && $valorOld == $opcion->valor_opcion) {{-- Usar old() si no es rellenable o no hay previa --}}
+                                checked
+                                @endif
+                                @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
                                 >
                                 <label class="form-check-label" for="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}">
                                     {{ htmlspecialchars($opcion->texto_opcion) }}
@@ -385,7 +400,12 @@
                                     id="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}"
                                     name="respuestas[{{ $pregunta->id }}][]"
                                     value="{{ $opcion->valor_opcion }}"
-                                    {{ (is_array(old('respuestas.' . $pregunta->id)) && in_array($opcion->valor_opcion, old('respuestas.' . $pregunta->id, []))) ? 'checked' : '' }}> {{-- No se añade 'required' a checkboxes individuales, se valida en backend o con JS si al menos uno es necesario --}}
+                                    @if($usarRespuestaPrevia && is_array($previousAnswers[$pregunta->id]) && in_array($opcion->valor_opcion, $previousAnswers[$pregunta->id]))
+                                checked
+                                @elseif(!$usarRespuestaPrevia && is_array($valorOld) && in_array($opcion->valor_opcion, $valorOld))
+                                checked
+                                @endif
+                                >
                                 <label class="form-check-label" for="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}">
                                     {{ htmlspecialchars($opcion->texto_opcion) }}
                                 </label>
@@ -395,32 +415,26 @@
                             <textarea class="form-control"
                                 id="pregunta_{{ $pregunta->id }}"
                                 name="respuestas[{{ $pregunta->id }}]"
-                                rows="5"
+                                rows="4"
                                 @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
-                                    aria-describedby="error_pregunta_{{ $pregunta->id }}"
-                                >{{ old('respuestas.' . $pregunta->id) }}</textarea>
-                            @else {{-- Asumimos 'text' o similar por defecto --}}
-                            <input type="text" class="form-control"
+                                >{{ $usarRespuestaPrevia ? htmlspecialchars($previousAnswers[$pregunta->id]) : htmlspecialchars($valorOld) }}</textarea>
+                            @else {{-- text, email, number, etc. --}}
+                            <input type="{{ htmlspecialchars($pregunta->tipo_input) }}" class="form-control"
                                 id="pregunta_{{ $pregunta->id }}"
                                 name="respuestas[{{ $pregunta->id }}]"
-                                value="{{ old('respuestas.' . $pregunta->id) }}"
+                                value="{{ $usarRespuestaPrevia ? htmlspecialchars($previousAnswers[$pregunta->id]) : htmlspecialchars($valorOld) }}"
                                 @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
-                            aria-describedby="error_pregunta_{{ $pregunta->id }}"
                             >
                             @endif
                         </div>
 
-                        {{-- Gestión de errores específicos por pregunta --}}
                         @error('respuestas.' . $pregunta->id)
-                        <div class="error-text mt-2" id="error_pregunta_{{ $pregunta->id }}">{{ $message }}</div>
+                        <div class="error-text mt-2">{{ $message }}</div>
                         @enderror
-                        {{-- Manejo específico para errores de array en checkboxes (e.g. 'selecciona al menos una opción') --}}
-                        @if ($pregunta->tipo_input === 'checkbox')
-                        @if ($errors->has('respuestas.' . $pregunta->id . '.*'))
+                        @if ($pregunta->tipo_input === 'checkbox' && $errors->has('respuestas.' . $pregunta->id . '.*'))
                         <div class="error-text mt-2">{{ $errors->first('respuestas.' . $pregunta->id . '.*') }}</div>
-                        @elseif ($errors->has('respuestas.' . $pregunta->id) && !$errors->has('respuestas.' . $pregunta->id . '.*'))
+                        @elseif ($pregunta->tipo_input === 'checkbox' && $errors->has('respuestas.' . $pregunta->id) && !$errors->has('respuestas.' . $pregunta->id . '.*'))
                         <div class="error-text mt-2">{{ $errors->first('respuestas.' . $pregunta->id) }}</div>
-                        @endif
                         @endif
                     </div>
                     @endforeach
@@ -582,16 +596,32 @@
                     }
                 });
             }
+            // --- INICIO DE MODIFICACIÓN ---
+            // Determinar la pregunta inicial (prioridad: ancla URL > error Laravel > primera pregunta)
+            let preguntaInicial = 0; // Por defecto, la primera pregunta (índice 0)
+            const urlHash = window.location.hash; // Ejemplo: "#pregunta-35"
 
-            // Determinar la pregunta inicial (si hay errores de Laravel, ir a la primera con error)
-            const hayErroresLaravel = "{{ $errors->any() ? 'true' : 'false' }}";
-            let preguntaInicial = 0;
+            if (urlHash && urlHash.startsWith('#pregunta-')) { //
+                const idPreguntaAncla = urlHash.substring('#pregunta-'.length); // Extrae "35"
+                if (idPreguntaAncla && bloquesDePregunta.length > 0) {
+                    for (let i = 0; i < totalDePreguntas; i++) {
+                        // Buscamos el bloque de pregunta que tiene el 'data-pregunta-id' correspondiente
+                        if (bloquesDePregunta[i].dataset.preguntaId === idPreguntaAncla) { //
+                            preguntaInicial = i; // Establece el índice de la pregunta a mostrar
+                            break;
+                        }
+                    }
+                }
+            } else {
 
-            if (hayErroresLaravel && totalDePreguntas > 0) {
-                for (let i = 0; i < totalDePreguntas; i++) {
-                    if (bloquesDePregunta[i].querySelector('.error-text')) {
-                        preguntaInicial = i;
-                        break;
+                // Determinar la pregunta inicial (si hay errores de Laravel, ir a la primera con error)
+                const hayErroresLaravel = "{{ $errors->any() ? 'true' : 'false' }}";
+                if (hayErroresLaravel && totalDePreguntas > 0) {
+                    for (let i = 0; i < totalDePreguntas; i++) {
+                        if (bloquesDePregunta[i].querySelector('.error-text')) {
+                            preguntaInicial = i;
+                            break;
+                        }
                     }
                 }
             }
@@ -604,6 +634,13 @@
             } else {
                 // Si no hay preguntas, los botones ya se ocultaron, pero actualizamos por si acaso.
                 actualizarEstadoBotones();
+                // Esto se llamaría si no hay preguntas, aunque Blade ya maneja este caso.
+                // Si había un error y los botones están ocultos, se mostrarían aquí.
+                // Sin embargo, con totalDePreguntas = 0, la lógica anterior de ocultarlos es más apropiada.
+                // Vamos a refinar esto ligeramente para el caso de 0 preguntas:
+                if (botonAnterior) botonAnterior.style.display = 'none';
+                if (botonSiguiente) botonSiguiente.style.display = 'none';
+                if (botonEnviar) botonEnviar.style.display = 'none';
             }
         });
     </script>
