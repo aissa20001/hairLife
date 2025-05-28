@@ -85,19 +85,21 @@ class CuestionarioController extends Controller
      * $id_cuestionario viene de la URL.
      * $request contiene todos los datos enviados por el formulario.
      */
+
     public function procesarEnvioParaNick(Request $request, $nick, $id_cuestionario)
     {
-        $cuestionario = Cuestionario::findOrFail($id_cuestionario); // Asegura que existe
+        $cuestionario = Cuestionario::findOrFail($id_cuestionario);
         $preguntasDelCuestionario = $cuestionario->preguntas()->with('opciones')->get();
 
         // --- Validación ---
         $rules = [];
         $messages = [];
         foreach ($preguntasDelCuestionario as $pregunta) {
-            //Si la pregunta es tipo checkbox, acepta varias opciones.
             if ($pregunta->tipo_input === 'checkbox') {
-                $rules['respuestas.' . $pregunta->id] = 'nullable|array'; // Permite no enviar nada si no es obligatorio, o espera un array
-                //Para otros tipos (radio, text, textarea), se marcan como obligatorias.
+                $rules['respuestas.' . $pregunta->id] = 'nullable|array';
+                // Para checkboxes, también podrías querer una regla como 'min:1' si al menos una opción es requerida,
+                // pero tendrías que manejarlo específicamente si la pregunta en sí es opcional vs obligatoria.
+                // Por ahora, 'nullable|array' permite que sea un array o que no se envíe.
             } else { // text, radio, textarea
                 $rules['respuestas.' . $pregunta->id] = 'required';
                 $messages['respuestas.' . $pregunta->id . '.required'] = 'La pregunta "' . htmlspecialchars(Str::limit($pregunta->enunciado, 50)) . '" es obligatoria.';
@@ -105,24 +107,29 @@ class CuestionarioController extends Controller
         }
 
         $validator = Validator::make($request->all(), $rules, $messages);
-        //Si la validación falla, redirige de nuevo a la vista del cuestionario con errores y los datos anteriores (withInput()).
+
         if ($validator->fails()) {
-            return redirect()->route('cuestionarios.mostrarParaNick', ['nick' => $nick, 'id_cuestionario' => $id_cuestionario])
+            return redirect()->route('cuestionarios.mostrarParaNick', [
+                'nick' => $nick,
+                'id_cuestionario' => $id_cuestionario,
+                // Si estás usando ?envio_previo=ID para rellenar, puede que quieras pasarlo de nuevo aquí
+                // para que el formulario mantenga esas respuestas previas en caso de error de validación.
+                // 'envio_previo' => $request->input('envio_previo_hidden_field') // Necesitarías un campo hidden
+            ])
                 ->withErrors($validator)
-                ->withInput();
+                ->withInput(); // withInput() rellenará con los datos actuales enviados que fallaron la validación.
         }
-        //Busca al usuario por su Nombre (que es el nick).
+
         $usuario = Usuario::where('Nombre', $nick)->first();
-        //Obtiene su Codigo, que se guarda con el envío.
         $usuarioCodigo = $usuario ? $usuario->Codigo : null;
-        //Crea un nuevo registro en la tabla cuestionario_envios, que sirve como "formulario enviado".
+
         $envio = CuestionarioEnvio::create([
             'usuario_codigo' => $usuarioCodigo,
             'cuestionario_id' => $id_cuestionario,
             'nick_utilizado' => $nick,
         ]);
 
-        $respuestasEnviadas = $request->input('respuestas', []); // Contiene todas las respuestas {id_pregunta => valor}
+        $respuestasEnviadas = $request->input('respuestas', []);
 
         foreach ($respuestasEnviadas as $id_pregunta => $valor_respuesta_o_array) {
             if (is_array($valor_respuesta_o_array)) { // Checkbox
@@ -142,49 +149,46 @@ class CuestionarioController extends Controller
             }
         }
 
+        // --- Lógica de Recomendación de Producto ---
         $recomendacionCreada = null;
-        $justificacionDetalle = "Hemos seleccionado este producto basado en tus respuestas generales.";
-        /* Al ser un prototipo las recomendaciones estan basadas a raiz de dos preguntas  la primera es el tipo de producto, y la otra es el tipo de pelo*/
-        // Busca el objeto Pregunta por su enunciado exacto.
+        $justificacionDetallePredeterminada = "Hemos seleccionado este producto basado en tus respuestas generales.";
+
         $preguntaCategoriaProductoObj = Pregunta::where('enunciado', '¿Qué producto quieres que te recomendemos?')->first();
         $idPreguntaCategoriaProducto = $preguntaCategoriaProductoObj ? $preguntaCategoriaProductoObj->id : null;
-        $categoriaProductoElegida = null; // Valor de la respuesta, ej: 'champu', 'aceite', 'todo'
-        $textoCategoriaElegida = 'cualquier tipo de producto'; // Para la justificación
+
+        $categoriaProductoElegida = null;
+        $textoCategoriaElegida = 'cualquier tipo de producto';
 
         if ($idPreguntaCategoriaProducto && isset($respuestasEnviadas[$idPreguntaCategoriaProducto])) {
             $categoriaProductoElegida = $respuestasEnviadas[$idPreguntaCategoriaProducto];
-            if ($categoriaProductoElegida !== 'todo') {
-                // Busca la opción de pregunta para obtener el texto descriptivo (ej. "Champú")
-                $opcionSeleccionada = $preguntaCategoriaProductoObj->opciones()->where('valor_opcion', $categoriaProductoElegida)->first();
-                $textoCategoriaElegida = $opcionSeleccionada ? htmlspecialchars($opcionSeleccionada->texto_opcion) : $categoriaProductoElegida;
-            }
+            // Como "todo" ya no es una opción y la pregunta es requerida, $categoriaProductoElegida será un valor específico.
+            $opcionSeleccionada = $preguntaCategoriaProductoObj->opciones()->where('valor_opcion', $categoriaProductoElegida)->first();
+            $textoCategoriaElegida = $opcionSeleccionada ? htmlspecialchars($opcionSeleccionada->texto_opcion) : htmlspecialchars($categoriaProductoElegida);
+        } else {
+            // Si la pregunta es requerida, este bloque 'else' no debería alcanzarse para $categoriaProductoElegida.
+            // $textoCategoriaElegida podría tener un fallback si $opcionSeleccionada es null por alguna razón.
+            $textoCategoriaElegida = 'un producto específico'; // Fallback
         }
 
-        // 2. Obtener respuesta para "¿Cuál es tu tipo de cabello?"
+
         $preguntaTipoCabelloObj = Pregunta::where('enunciado', '¿Cuál es tu tipo de cabello?')->first();
         $idPreguntaTipoCabello = $preguntaTipoCabelloObj ? $preguntaTipoCabelloObj->id : null;
-        $tipoCabelloUsuario = null; // Valor de la respuesta, ej: 'liso', 'ondulado'
-        $textoTipoCabelloUsuario = 'todos los tipos de cabello'; // Para la justificación
+        $tipoCabelloUsuario = null;
+        $textoTipoCabelloUsuario = 'todos los tipos de cabello';
 
         if ($idPreguntaTipoCabello && isset($respuestasEnviadas[$idPreguntaTipoCabello])) {
             $tipoCabelloUsuario = $respuestasEnviadas[$idPreguntaTipoCabello];
-            // Busca la opción de pregunta para obtener el texto descriptivo (ej. "Liso")
             $opcionSeleccionada = $preguntaTipoCabelloObj->opciones()->where('valor_opcion', $tipoCabelloUsuario)->first();
-            $textoTipoCabelloUsuario = $opcionSeleccionada ? htmlspecialchars($opcionSeleccionada->texto_opcion) : $tipoCabelloUsuario;
+            $textoTipoCabelloUsuario = $opcionSeleccionada ? ($opcionSeleccionada->texto_opcion) : ($tipoCabelloUsuario);
         }
 
-        // 3. Construir la consulta para buscar el producto
         $queryProducto = Producto::query();
 
-        // Filtrar por categoría de producto si se eligió una específica
         if ($categoriaProductoElegida && $categoriaProductoElegida !== 'todo') {
             $queryProducto->where('categoria', $categoriaProductoElegida);
         }
 
-        // Filtrar por tipo de cabello usando palabras clave en la descripción
         if ($tipoCabelloUsuario) {
-            // Este mapeo debe ser tan preciso como las descripciones de tus productos.
-            // Se basa en cómo están redactadas las descripciones en tus datos de ejemplo.
             $keywordParaDescripcion = "";
             switch ($tipoCabelloUsuario) {
                 case 'liso':
@@ -197,56 +201,58 @@ class CuestionarioController extends Controller
                     $keywordParaDescripcion = "para cabello rizado";
                     break;
                 case 'muy_rizado_afro':
-                    // Si tu descripción puede decir "muy rizado" o "afro"
                     $queryProducto->where(function ($q) {
                         $q->where('descripcion', 'LIKE', '%para cabello muy rizado%')
                             ->orWhere('descripcion', 'LIKE', '%para cabello afro%');
                     });
-                    $keywordParaDescripcion = null; // Evita que se aplique el where de abajo si ya se manejó aquí
+                    $keywordParaDescripcion = null; // Para evitar que se aplique el siguiente if
                     break;
             }
+            // ***** ESTA ES LA CORRECCIÓN IMPORTANTE *****
+            if ($keywordParaDescripcion) {
+                $queryProducto->where('descripcion', 'LIKE', '%' . $keywordParaDescripcion . '%');
+            }
+            // *******************************************
         }
 
-        // Intentar encontrar un producto con los filtros aplicados, eligiendo uno al azar si hay varios
         $productoRecomendado = $queryProducto->inRandomOrder()->first();
 
-        // Estrategia de Fallback (Respaldo): Si no se encuentra producto con filtros específicos, ampliar búsqueda.
-        // Por ejemplo, si pidió un "aceite para cabello liso" y no hay, buscar "cualquier producto para cabello liso".
+        // Estrategia de Fallback
         if (!$productoRecomendado && $tipoCabelloUsuario) {
-            $queryFallbackTipoCabello = Producto::query(); // Nueva consulta
-            $keywordParaDescripcion = ""; // Reset
+            $queryFallbackTipoCabello = Producto::query(); // Nueva consulta para el fallback
+            // Asegúrate de no filtrar por categoría aquí si el objetivo es solo el tipo de cabello
+            $keywordParaDescripcionFallback = "";
             switch ($tipoCabelloUsuario) {
                 case 'liso':
-                    $keywordParaDescripcion = "para cabello liso";
+                    $keywordParaDescripcionFallback = "para cabello liso";
                     break;
                 case 'ondulado':
-                    $keywordParaDescripcion = "para cabello ondulado";
+                    $keywordParaDescripcionFallback = "para cabello ondulado";
                     break;
                 case 'rizado':
-                    $keywordParaDescripcion = "para cabello rizado";
+                    $keywordParaDescripcionFallback = "para cabello rizado";
                     break;
                 case 'muy_rizado_afro':
                     $queryFallbackTipoCabello->where(function ($q) {
                         $q->where('descripcion', 'LIKE', '%para cabello muy rizado%')
                             ->orWhere('descripcion', 'LIKE', '%para cabello afro%');
                     });
-                    $keywordParaDescripcion = null;
+                    $keywordParaDescripcionFallback = null;
                     break;
             }
-            if ($keywordParaDescripcion) {
-                $queryFallbackTipoCabello->where('descripcion', 'LIKE', '%' . $keywordParaDescripcion . '%');
+            if ($keywordParaDescripcionFallback) {
+                $queryFallbackTipoCabello->where('descripcion', 'LIKE', '%' . $keywordParaDescripcionFallback . '%');
             }
-            $productoRecomendado = $queryFallbackTipoCabello->inRandomOrder()->first(); // Intenta de nuevo solo con tipo de cabello
+            $productoRecomendado = $queryFallbackTipoCabello->inRandomOrder()->first();
         }
 
-        // Fallback general si aún no hay producto (muy poco probable si la BD tiene productos)
         if (!$productoRecomendado) {
-            $productoRecomendado = Producto::inRandomOrder()->first(); // Un producto totalmente aleatorio como último recurso
+            $productoRecomendado = Producto::inRandomOrder()->first(); // Fallback final: un producto totalmente aleatorio
         }
 
-        // 4. Crear la recomendación si se encontró un producto
+        // Crear la recomendación si se encontró un producto
         if ($productoRecomendado) {
-            // Construir justificación detallada y personalizada
+            $justificacionDetalle = $justificacionDetallePredeterminada; // Iniciar con la predeterminada
             if ($tipoCabelloUsuario && ($categoriaProductoElegida && $categoriaProductoElegida !== 'todo')) {
                 $justificacionDetalle = "Basado en tu selección de cabello '{$textoTipoCabelloUsuario}' y tu interés por un '{$textoCategoriaElegida}', te sugerimos este producto.";
             } elseif ($tipoCabelloUsuario) {
@@ -254,7 +260,6 @@ class CuestionarioController extends Controller
             } elseif ($categoriaProductoElegida && $categoriaProductoElegida !== 'todo') {
                 $justificacionDetalle = "Ya que buscas un '{$textoCategoriaElegida}', te recomendamos este producto.";
             }
-            // Si no hay ninguna preferencia específica, se usa el mensaje general definido al inicio.
 
             $recomendacionCreada = Recomendacion::create([
                 'envio_id' => $envio->id,
@@ -264,20 +269,24 @@ class CuestionarioController extends Controller
             ]);
         }
 
-
         if ($recomendacionCreada) {
             return redirect()->route('cuestionarios.gracias', ['nick' => $nick, 'recomendacionId' => $recomendacionCreada->id])
                 ->with('success', '¡Cuestionario enviado! ' . htmlspecialchars($nick) . ', estamos preparando tu recomendación personalizada...');
         } else {
-            // Si por alguna razón no se pudo crear una recomendación (ej. no hay productos que coincidan)
-            return redirect()->route('cuestionarios.gracias', ['nick' => $nick]) // No se pasa recomendacionId
-                ->with('success', '¡Cuestionario enviado con éxito, ' . htmlspecialchars($nick) . '! No pudimos generar una recomendación específica esta vez, pero valoramos tus respuestas.');
+            return redirect()->route('cuestionarios.gracias', ['nick' => $nick])
+                ->with('success', '¡Cuestionario enviado con éxito, ' . htmlspecialchars($nick) . '! Aunque valoramos tus respuestas, no pudimos generar una recomendación específica esta vez.');
         }
     }
-    // Método para mostrar la página de gracias (MODIFICADO para aceptar recomendacionId opcional)
+
+    /**
+     * Muestra la página de agradecimiento.
+     *
+     * @param  string  $nick
+     * @param  int|null  $recomendacionId
+     * @return \Illuminate\View\View
+     */
     public function mostrarPaginaGracias($nick, $recomendacionId = null)
     {
-        // Puedes pasar datos si tu vista 'gracias' los necesita
         return view('cuestionarios.gracias', ['nick' => $nick, 'recomendacionId' => $recomendacionId]);
     }
 }
