@@ -11,83 +11,94 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
+        /* ... (tus variables :root y estilos generales de body, body::before sin cambios) ... */
         :root {
-            /* Paleta de Morados con Nombres de Colores */
             --purple-primary: RebeccaPurple;
-            /* Morado principal para acciones */
             --purple-secondary: MediumPurple;
-            /* Morado secundario para acentos */
             --purple-dark: Indigo;
-            /* Morado oscuro para textos importantes */
             --purple-medium: MediumSlateBlue;
-            /* Morado medio */
             --purple-light: Thistle;
-            /* Morado claro para fondos sutiles o bordes */
             --purple-very-light: Lavender;
-            /* Morado muy claro */
             --purple-background: GhostWhite;
-            /* Fondo general de la página, casi blanco */
-
-            /* Otros colores base */
             --text-on-purple: white;
-            /* Texto para usar sobre fondos morados oscuros */
             --card-bg: white;
-            /* Fondo para contenedores tipo tarjeta */
             --text-color-primary: #333;
-            /* Color de texto principal */
             --text-color-secondary: #555;
-            /* Color de texto secundario */
             --border-color: var(--purple-light);
-            /* Color de borde suave */
-
-            /* Sombra elegante */
             --card-shadow-elegant: rgba(102, 51, 153, 0.15);
-            /* Sombra con tono morado */
-
-            /* Variables de foco para inputs */
             --input-focus-border-color: var(--purple-secondary);
             --input-focus-box-shadow: 0 0 0 0.25rem rgba(147, 112, 219, 0.25);
-            /* Sombra de foco con tono MediumPurple */
+            --purple-primary-rgb: 102, 51, 153;
+            /* Para RebeccaPurple */
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--purple-background);
             color: var(--text-color-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
             margin: 0;
+            padding: 0;
             position: relative;
             z-index: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         body::before {
             content: "";
             position: fixed;
-            /* Cubre toda la ventana y se queda fijo */
             top: 0;
             left: 0;
             width: 100vw;
-            /* Ancho completo de la ventana */
             height: 100vh;
-            /* Alto completo de la ventana */
-
             background-image: url('/storage/imagenes/fondo.jpg');
-            /* ¡Asegúrate que esta ruta sea correcta! */
             background-repeat: repeat;
             background-size: 250px;
-            /* Ajusta el tamaño del patrón como desees */
-
             opacity: 0.2;
-            /* Opacidad solicitada. Ajusta si 0.6 era lo que querías (más visible) */
-
             z-index: -1;
-            /* Se coloca detrás de todo el contenido del body */
             pointer-events: none;
-            /* Para asegurar que no interfiera con clics u otras interacciones */
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            /* Padding para el contenido central, no afectará a las tarjetas absolutas */
+            width: 100%;
+            position: relative;
+            /* Necesario para posicionar las tarjetas de forma absoluta dentro de él */
+            overflow: hidden;
+            /* Para evitar que las tarjetas causen scroll si el viewport es muy justo */
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 30px;
+            z-index: 1;
+            /* Para que esté sobre el fondo pero potencialmente debajo de las tarjetas si se superponen */
+        }
+
+        .hairlife-title {
+            font-family: 'Dancing Script', cursive;
+            color: var(--purple-dark);
+            font-size: 6rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            /* Sombra más marcada */
+        }
+
+        .main-content-area {
+            /* Ya no necesita flex para las imágenes laterales, solo para centrar el nick-creation-container si fuera necesario */
+            /* display: flex; */
+            /* align-items: center; */
+            /* justify-content: center; */
+            width: 100%;
+            /* gap: 20px; */
+            /* Ya no es necesario aquí */
+            z-index: 1;
         }
 
         .nick-creation-container {
@@ -95,31 +106,22 @@
             border-radius: 12px;
             border: 1px solid var(--border-color);
             box-shadow: 0 8px 25px var(--card-shadow-elegant);
-            max-width: 500px;
+            max-width: 450px;
             width: 100%;
             padding: 30px 40px;
-            /* Más padding horizontal */
             text-align: center;
+            margin: 0 auto;
+            /* Para centrarlo si .main-content-area no es flex-center */
         }
 
         .page-title {
             font-family: 'Dancing Script', cursive;
             color: var(--purple-dark);
-            font-size: 3.5rem;
-            /* Letras grandes para el título */
+            font-size: 3.0rem;
             margin-bottom: 25px;
         }
 
-        .form-label {
-            font-weight: 500;
-            color: var(--purple-dark);
-            margin-bottom: 8px;
-            display: block;
-            /* Para que ocupe su propia línea si es necesario */
-        }
-
         .form-control-custom {
-            /* Clase personalizada para el input */
             border-radius: 8px;
             border: 1px solid var(--purple-light);
             padding: 10px 15px;
@@ -131,11 +133,9 @@
             border-color: var(--input-focus-border-color);
             box-shadow: var(--input-focus-box-shadow);
             outline: 0;
-            /* Quitar el outline por defecto del navegador */
         }
 
         .btn-acceder {
-            /* Botón personalizado con Bootstrap y tema morado */
             background-color: var(--purple-primary);
             border-color: var(--purple-primary);
             color: var(--text-on-purple);
@@ -148,43 +148,202 @@
 
         .btn-acceder:hover {
             background-color: var(--purple-dark);
-            /* Un morado más oscuro al pasar el ratón */
             border-color: var(--purple-dark);
             color: var(--text-on-purple);
             transform: translateY(-2px);
-            /* Ligero efecto de elevación */
         }
 
         .error-message {
-            /* Estilo para el mensaje de error */
             background-color: rgba(220, 53, 69, 0.1);
-            /* Fondo rojo claro translúcido */
             color: #842029;
-            /* Texto rojo oscuro para errores */
             border: 1px solid rgba(220, 53, 69, 0.2);
             border-radius: 8px;
             padding: 10px 15px;
             margin-top: 20px;
             font-size: 0.9rem;
         }
+
+        /* --- Estilos para las Tarjetas que se Voltean --- */
+        .flip-card {
+            background-color: transparent;
+            width: 360px;
+            /* Ancho rectangular */
+            height: 560px;
+            /* Alto rectangular */
+            perspective: 1000px;
+            border-radius: 10px;
+            z-index: 2;
+            /* Para que estén sobre el contenido central si hay superposición accidental */
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.7s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(var(--purple-primary-rgb), 0.25);
+        }
+
+        .flip-card-front {
+            background-color: var(--purple-light);
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+
+        .flip-card-back {
+            background-color: var(--purple-primary);
+            color: var(--text-on-purple);
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .flip-card-back h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            /* Ajustado para el tamaño de tarjeta */
+            margin-bottom: 8px;
+        }
+
+        .flip-card-back p {
+            font-size: 0.85rem;
+            /* Ajustado para el tamaño de tarjeta */
+            margin-bottom: 0;
+        }
+
+        /* --- Posicionamiento específico para las tarjetas laterales --- */
+        .flip-card-page-left {
+            position: absolute;
+            left: 40px;
+            /* Distancia desde el borde izquierdo de page-container */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .flip-card-page-right {
+            position: absolute;
+            right: 40px;
+            /* Distancia desde el borde derecho de page-container */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* --- Media Queries --- */
+        @media (max-width: 1200px) {
+
+            /* Ajusta este breakpoint si es necesario */
+            .flip-card-page-left {
+                left: 20px;
+                /* Más cerca del borde en pantallas medianas */
+            }
+
+            .flip-card-page-right {
+                right: 20px;
+                /* Más cerca del borde en pantallas medianas */
+            }
+
+            .flip-card {
+                /* Reducir ligeramente el tamaño de las tarjetas */
+                width: 140px;
+                height: 230px;
+            }
+        }
+
+        @media (max-width: 992px) {
+
+            /* En pantallas más pequeñas, ocultamos las tarjetas laterales para no saturar */
+            .flip-card-page-left,
+            .flip-card-page-right {
+                display: none;
+            }
+
+            .hairlife-title {
+                font-size: 3.5rem;
+            }
+
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .nick-creation-container {
+                max-width: 100%;
+                padding: 20px;
+            }
+        }
+
+        /* La media query anterior para .main-content-area (apilar elementos) ya no es relevante
+           para las tarjetas, pero la de .nick-creation-container y títulos sigue siendo útil. */
     </style>
 </head>
 
 <body>
-    <div class="nick-creation-container">
-        <h1 class="page-title">Crear Nickname</h1>
+    <div class="page-container">
 
-        <form action="/guardar-nick" method="POST"> @csrf <div class="mb-3">
-                <input type="text" name="nick" class="form-control form-control-custom" id="nickInput" placeholder="Ingrese su nick" required>
+        <div class="flip-card flip-card-page-left">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('/storage/imagenes/crearnick.jpg');">
+                </div>
+                <div class="flip-card-back">
+                    <h3>HairLife</h3>
+                    <p>Estilo & Cuidado</p>
+                </div>
             </div>
-            <button type="submit" class="btn btn-acceder w-100">Acceder</button>
-        </form>
-
-        @if(session('error'))
-        <div class="error-message mt-3">
-            {{ session('error') }}
         </div>
-        @endif
+
+        <header class="main-header">
+            <h1 class="hairlife-title">HairLife</h1>
+        </header>
+
+        <div class="main-content-area">
+            <div class="nick-creation-container">
+                <h2 class="page-title">Crear Nickname</h2>
+                <form action="/guardar-nick" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <input type="text" name="nick" class="form-control form-control-custom" id="nickInput" placeholder="Ingrese su nick" required>
+                    </div>
+                    <button type="submit" class="btn btn-acceder w-100">Acceder</button>
+                </form>
+                @if(session('error'))
+                <div class="error-message mt-3">
+                    {{ session('error') }}
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="flip-card flip-card-page-right">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('/storage/imagenes/logocrear.jpeg');">
+                </div>
+                <div class="flip-card-back">
+                    <h3>HairLife</h3>
+                    <p>Innovación Capilar</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

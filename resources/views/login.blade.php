@@ -135,7 +135,7 @@
                Placeholder actual: https://placehold.co/600x800/8e44ad/ffffff?text=HairLife&font=dancing-script
                Para --morado-secundario (MediumPurple #9370DB): https://placehold.co/600x800/9370DB/ffffff?text=HairLife&font=dancing-script
             */
-            background-image: url('/storage/imagenes/foto_logo.jpg');
+            background-image: url('storage/imagenes/logo_morado.png');
             /* Imagen de fondo. */
             background-size: cover;
             /* Asegura que la imagen cubra toda la sección, puede recortar partes. */
@@ -339,6 +339,7 @@
     <div class="login-container">
         <div class="login-image-section">
         </div>
+
 
         <div class="login-form-section">
             <h1 class="welcome-title">Bienvenid@s a HairLife</h1>
