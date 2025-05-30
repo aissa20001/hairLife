@@ -265,8 +265,8 @@
 
             .flip-card {
                 /* Reducir ligeramente el tamaño de las tarjetas */
-                width: 140px;
-                height: 230px;
+                width: 250px;
+                height: 430px;
             }
         }
 
@@ -279,7 +279,7 @@
             }
 
             .hairlife-title {
-                font-size: 3.5rem;
+                font-size: 5rem;
             }
 
             .page-title {

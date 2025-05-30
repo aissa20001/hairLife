@@ -268,8 +268,8 @@
         <div class="product-header">
             <h1 class="product-name">{{ $producto->nombre }}</h1>
             <p class="product-brand-category">
-                <strong>Marca:</strong> {{ htmlspecialchars($producto->marca) }} |
-                <strong>Categoría:</strong> {{ htmlspecialchars(ucfirst($producto->categoria)) }}
+                <strong>Marca:</strong> {{ $producto->marca }} |
+                <strong>Categoría:</strong> {{ ucfirst($producto->categoria) }}
             </p>
         </div>
 
@@ -303,7 +303,7 @@
             @else
             <a href="{{ route('crear.nick') }}">Ir al Inicio</a>
             @endif
-            <a href="{{ route('login') }}">Comenzar de Nuevo</a>
+            <a href="{{ route('login') }}">Cerrar Sesión</a>
         </div>
     </div>
 

@@ -63,9 +63,12 @@
         }
 
         .header-panel {
-            background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary)), url('https://placehold.co/1920x400/4c0b56/8e44ad.png?text=HairLife+Banner&font=dancing-script') no-repeat center center;
+
+            background-image: url('/storage/imagenes/foto_banner.jpeg');
+            /* Correcto si la URL directa funciona */
             background-size: cover;
-            background-blend-mode: overlay;
+            background-position: center center;
+            background-repeat: no-repeat;
             color: var(--text-on-purple);
             padding: 60px 20px;
             text-align: center;
@@ -74,17 +77,19 @@
 
         .header-panel h1 {
             font-family: 'Dancing Script', cursive;
-            font-size: 4rem;
+            font-size: 5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            color: #d9aadf;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
         }
 
         .header-panel p {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
+            color: #d9aadf;
             opacity: 0.95;
             margin-bottom: 0;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
         }
 
         .buttons-panel-section {
@@ -102,7 +107,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 105%;
+            height: 115%;
 
             background-image: url('/storage/imagenes/fondo.jpg');
             /* ¡ESTA ES LA RUTA CORRECTA! */
@@ -350,7 +355,7 @@
         .site-footer {
             background-color: var(--purple-dark);
             color: rgba(255, 255, 255, 0.8);
-            padding: 30px 0;
+            padding: 5px 0;
             text-align: center;
             font-size: 0.9em;
             margin-top: auto;

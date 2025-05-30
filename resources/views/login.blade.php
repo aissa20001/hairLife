@@ -135,8 +135,8 @@
                Placeholder actual: https://placehold.co/600x800/8e44ad/ffffff?text=HairLife&font=dancing-script
                Para --morado-secundario (MediumPurple #9370DB): https://placehold.co/600x800/9370DB/ffffff?text=HairLife&font=dancing-script
             */
-            background-image: url('storage/imagenes/logo_morado.png');
-            /* Imagen de fondo. */
+            background-image: url('/storage/imagenes/logo_morado.png');
+            background-repeat: no-repeat;
             background-size: cover;
             /* Asegura que la imagen cubra toda la sección, puede recortar partes. */
             background-position: center;
