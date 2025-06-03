@@ -208,28 +208,58 @@
         }
 
         .flip-card-back {
-            background-color: var(--purple-primary);
             color: var(--text-on-purple);
             transform: rotateY(180deg);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 15px;
+            padding: 20px;
             font-family: 'Montserrat', sans-serif;
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .flip-card-back::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(var(--purple-primary-rgb), 0.65), rgba(var(--purple-dark-rgb), 0.8));
+            border-radius: 10px;
+            /* Coincidir con el border-radius de .flip-card-back */
+            z-index: -1;
         }
 
         .flip-card-back h3 {
             font-family: 'Dancing Script', cursive;
-            font-size: 1.8rem;
+            font-size: 3rem;
             /* Ajustado para el tamaño de tarjeta */
             margin-bottom: 8px;
+            text-shadow:
+                0px 0px 2px rgba(0, 0, 0, 0.7),
+                /* Borde muy sutil oscuro */
+                1px 1px 5px rgba(0, 0, 0, 0.8),
+                /* Sombra principal más oscura y un poco más difusa */
+                0 0 10px var(--purple-medium);
+            z-index: 2;
+            color: white;
         }
 
         .flip-card-back p {
-            font-size: 0.85rem;
-            /* Ajustado para el tamaño de tarjeta */
+            font-size: 1.3rem;
+            font-weight: 500;
             margin-bottom: 0;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+            /* Sombra más intensa */
+            position: relative;
+            z-index: 2;
+            color: whitesmoke;
         }
 
         /* --- Posicionamiento específico para las tarjetas laterales --- */
@@ -304,7 +334,7 @@
             <div class="flip-card-inner">
                 <div class="flip-card-front" style="background-image: url('/storage/imagenes/crearnick.jpg');">
                 </div>
-                <div class="flip-card-back">
+                <div class="flip-card-back " style=" background-image: url('/storage/imagenes/pelofan.jpg');">
                     <h3>HairLife</h3>
                     <p>Estilo & Cuidado</p>
                 </div>
@@ -337,7 +367,7 @@
             <div class="flip-card-inner">
                 <div class="flip-card-front" style="background-image: url('/storage/imagenes/logocrear.jpeg');">
                 </div>
-                <div class="flip-card-back">
+                <div class="flip-card-back" style="background-image: url('/storage/imagenes/pelofan1.jpg');">
                     <h3>HairLife</h3>
                     <p>Innovación Capilar</p>
                 </div>
