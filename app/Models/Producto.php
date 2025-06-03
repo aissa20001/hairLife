@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Producto extends Model
 {
-    use HasFactory;
+    use HasFactory; // Ayuda a crear productos de prueba fácilmente.
 
+    // El nombre de la tabla en la base de datos para este modelo.
     protected $table = 'producto';
-    protected $primaryKey = 'idproducto';
-    public $timestamps = false; // Asumiendo que no tienes created_at, updated_at en esta tabla
 
+    // La clave primaria de esta tabla no es 'id', es 'idproducto'.
+    protected $primaryKey = 'idproducto';
+
+    // No necesito las columnas 'created_at' y 'updated_at' en esta tabla.
+    public $timestamps = false;
+
+    // Los campos que puedo rellenar cuando creo o actualizo un producto.
     protected $fillable = [
         'nombre',
         'marca',
@@ -22,9 +28,14 @@ class Producto extends Model
         'foto',
     ];
 
-    // Relación: Un producto puede estar en muchas recomendaciones
+    /**
+     * Un producto puede aparecer en muchas recomendaciones.
+     */
     public function recomendaciones()
     {
+        // Un Producto tiene muchas Recomendaciones.
+        // 'id_producto' es la columna en la tabla 'recomendaciones' que guarda el ID de este producto.
+        // 'idproducto' es la clave primaria de este modelo (Producto).
         return $this->hasMany(Recomendacion::class, 'id_producto', 'idproducto');
     }
 }

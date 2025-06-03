@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
-// use Illuminate\Support\Str;
+
 
 class LoginController extends Controller
 {
@@ -25,9 +25,9 @@ class LoginController extends Controller
         if ($usuario && Hash::check($credentials['Clave'], $usuario->Clave)) {
             // Si la autenticación es exitosa, se inicia la sesión
             session([
-                'usuario_codigo' => $usuario->Codigo, //
-                'usuario_nombre' => $usuario->Nombre, //Nombre usado para login
-                'usuario_rol' => $usuario->Rol, //
+                'usuario_codigo' => $usuario->Codigo,
+                'usuario_nombre' => $usuario->Nombre,
+                'usuario_rol' => $usuario->Rol,
                 'usuario_display_nick' => $usuario->nick // Guardamos  el nick de display (columna 'nick')
             ]); //
             $urlDestino = '/';
@@ -35,8 +35,8 @@ class LoginController extends Controller
             if ($usuario->Rol == 1) { // Admin
                 $urlDestino = url('/admin');
             } elseif ($usuario->Rol == 0) { // Usuario normal
-                // Redirige al panel usando el 'Nombre' del usuario
-                // como el parámetro 'nick' para la ruta 'user.dashboard'.
+                // Redirige al panel usando el nombre del usuario
+                // como el parámetro nick para la ruta user.dashboard.
                 $dashboardUrl = route('user.dashboard', ['nick' => $usuario->Nombre]);
 
 

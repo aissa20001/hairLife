@@ -10,24 +10,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Si decides mantener /u_redirect, asegúrate de que esté bien implementado
-Route::get('/u_redirect', function (Illuminate\Http\Request $request) {
-    $nick = $request->input('nick');
-    if ($nick) {
-        $validatedNick = preg_replace('/[^a-zA-Z0-9_-]/', '', $nick);
-        if (!empty($validatedNick)) {
-            return redirect()->route('user.dashboard', ['nick' => $validatedNick]);
-        }
-    }
-    return redirect()->route('home')->with('error', 'Por favor, introduce un nick válido.');
-})->name('user.redirect');
 
+// --- Rutas del Login ---
 Route::get('/login', [LoginController::class, 'mostrarLogin'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::get('/logout', [LoginController::class, 'logout']);
 Route::get('/crear-nick', [LoginController::class, 'mostrarNick'])->name('crear.nick');
 Route::post('/guardar-nick', [LoginController::class, 'guardarNick']);
-
+// --- Rutas del Panel ---
 Route::get('/u/{nick}', [HomeController::class, 'mostrar'])->name('user.dashboard');
 Route::get('/u/{nick}/mi-pelo', [HomeController::class, 'showMiPelo'])->name('user.mipelo');
 Route::get('/u/{nick}/peinados-cortes', [HomeController::class, 'showPeinadosCortes'])->name('user.peinadoscortes');

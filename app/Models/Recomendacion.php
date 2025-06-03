@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Recomendacion extends Model
 {
-    use HasFactory;
+    use HasFactory; // Me ayuda a crear recomendaciones de prueba fácilmente.
 
+    // El nombre de la tabla en la base de datos para este modelo.
     protected $table = 'recomendaciones';
-    //Indica que esta tabla no tiene las columnas automáticas created_at y updated_at.
+
+    // No necesito las columnas 'created_at' y 'updated_at' en esta tabla.
     public $timestamps = false;
 
-    //Esto define qué campos pueden ser asignados en masa
+    // Los campos que puedo rellenar cuando creo o actualizo una recomendación.
     protected $fillable = [
         'envio_id',
         'id_producto',
@@ -21,14 +23,25 @@ class Recomendacion extends Model
         'justificacion_detalle',
     ];
 
-    //Define una relación de tipo belongsTo (muchas recomendaciones pueden pertenecer a un solo envío de cuestionario).
+    /**
+     * Una recomendación siempre pertenece a un envío de cuestionario.
+     */
     public function envio()
     {
+        // Conecto esta recomendación a su CuestionarioEnvio.
+        // 'envio_id' es la columna en esta tabla que guarda el ID del envío.
+        // 'id' es la clave primaria en la tabla de CuestionarioEnvio.
         return $this->belongsTo(CuestionarioEnvio::class, 'envio_id', 'id');
     }
-    //Otra relación de tipo belongsTo.
+
+    /**
+     * Una recomendación siempre se refiere a un producto específico.
+     */
     public function producto()
     {
+        // Conecto esta recomendación a su Producto.
+        // 'id_producto' es la columna en esta tabla que guarda el ID del producto.
+        // 'idproducto' es la clave primaria en la tabla de Producto.
         return $this->belongsTo(Producto::class, 'id_producto', 'idproducto');
     }
 }

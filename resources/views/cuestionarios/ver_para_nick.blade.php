@@ -13,15 +13,15 @@
 
     <style>
         :root {
-            --purple-primary: #6a0dad;
-            --purple-secondary: #8e44ad;
-            --purple-dark: #4c0b56;
-            --purple-medium: #7952b3;
-            --purple-light: #c3a2d9;
-            --purple-very-light: #e0cce8;
-            --purple-background: #f8f5f9;
-            --text-on-purple: #ffffff;
-            --card-bg: #ffffff;
+            --purple-primary: RebeccaPurple;
+            --purple-secondary: MediumPurple;
+            --purple-dark: Indigo;
+            --purple-medium: MediumSlateBlue;
+            --purple-light: Thistle;
+            --purple-very-light: Lavender;
+            --purple-background: GhostWhite;
+            --text-on-purple: white;
+            --card-bg: white;
             --border-color: var(--purple-very-light);
             --input-focus-color: var(--purple-secondary);
             --input-focus-box-shadow: rgba(142, 68, 173, 0.25);
@@ -379,7 +379,7 @@
                     $valorOld = old('respuestas.' . $pregunta->id);
                     @endphp
                     <div class="pregunta-bloque" id="pregunta-{{ $pregunta->id }}" data-pregunta-id="{{ $pregunta->id }}">
-                        <label class="pregunta-enunciado mb-3">{{ $loop->iteration }}. {{ htmlspecialchars($pregunta->enunciado) }}
+                        <label class="pregunta-enunciado mb-3">{{ $loop->iteration }}. {{ $pregunta->enunciado }}
                             @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required'))
                             <span class="text-danger">*</span>
                             @endif
@@ -401,7 +401,7 @@
                                 @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
                                 >
                                 <label class="form-check-label" for="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}">
-                                    {{ htmlspecialchars($opcion->texto_opcion) }}
+                                    {{$opcion->texto_opcion }}
                                 </label>
                             </div>
                             @endforeach
@@ -419,7 +419,7 @@
                                 @endif
                                 >
                                 <label class="form-check-label" for="pregunta_{{ $pregunta->id }}_opcion_{{ $opcion->id }}">
-                                    {{ htmlspecialchars($opcion->texto_opcion) }}
+                                    {{ $opcion->texto_opcion }}
                                 </label>
                             </div>
                             @endforeach
@@ -429,12 +429,12 @@
                                 name="respuestas[{{ $pregunta->id }}]"
                                 rows="4"
                                 @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
-                                >{{ $usarRespuestaPrevia ? htmlspecialchars($previousAnswers[$pregunta->id]) : htmlspecialchars($valorOld) }}</textarea>
+                                >{{ $usarRespuestaPrevia ? $previousAnswers[$pregunta->id] : $valorOld }}</textarea>
                             @else {{-- text, email, number, etc. --}}
-                            <input type="{{ htmlspecialchars($pregunta->tipo_input) }}" class="form-control"
+                            <input type="{{$pregunta->tipo_input }}" class="form-control"
                                 id="pregunta_{{ $pregunta->id }}"
                                 name="respuestas[{{ $pregunta->id }}]"
-                                value="{{ $usarRespuestaPrevia ? htmlspecialchars($previousAnswers[$pregunta->id]) : htmlspecialchars($valorOld) }}"
+                                value="{{ $usarRespuestaPrevia ? $previousAnswers[$pregunta->id] : $valorOld }}"
                                 @if(collect(json_decode($pregunta->reglas_validacion, true) ?? [])->has('required')) required @endif
                             >
                             @endif

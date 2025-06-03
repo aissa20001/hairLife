@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cuestionario;
-use App\Models\Usuario; // ¡ASEGÚRATE DE IMPORTAR EL MODELO USUARIO!
-use Illuminate\Http\Request; // No se usa en los métodos actuales, pero es buena práctica tenerlo si lo añades.
+use App\Models\Usuario;
+//use Illuminate\Http\Request; 
 
 class HomeController extends Controller
 {
-    public function mostrar($nickDeURL) // Este $nickDeURL será el 'Nombre' del usuario
+    public function mostrar($nickDeURL) // Este parametro será el Nombre del usuario
     {
         // Busca al usuario por su 'Nombre' que viene en la URL
         $usuario = Usuario::where('Nombre', $nickDeURL)->firstOrFail();
@@ -17,29 +17,24 @@ class HomeController extends Controller
 
         // La vista se llama 'user_dashboard.show'
         return view('user_dashboard.show', [
-            'nick' => $usuario->Nombre, // El Nombre principal que identifica al usuario
-            'displayNick' => $usuario->nick, // El nick de display (de la columna 'nick'), puede ser null
+            'nick' => $usuario->Nombre,
+            'displayNick' => $usuario->nick,
             'cuestionarioOficial' => $cuestionarioOficial,
-            // Puedes añadir una variable para indicar si necesita completar el nick de display
             'necesitaCompletarNick' => session('necesita_completar_nick_display', false)
         ]);
     }
 
-    /**
-     * Muestra la página placeholder para "Mi Pelo".
-     */
-    public function showMiPelo($nick) // Coincide con la ruta 'user.mipelo' (corregida)
+    //Muestra la pagina de MiPelo (EN DESARROLLO)
+    public function showMiPelo($nick)
     {
-        // Asegúrate que la vista 'user_dashboard.mi_pelo' existe
+        //muestra la vista y le pasa el nick para que sepa a qué usuario pertenece
         return view('user_dashboard.mi_pelo', ['nick' => $nick]);
     }
 
-    /**
-     * Muestra la página placeholder para "Peinados y Cortes".
-     */
+    //Muestra la pagina de Peinados y Cortes (EN DESARROLLO)
     public function showPeinadosCortes($nick) // Coincide con la ruta 'user.peinadoscortes' (corregida)
     {
-        // Asegúrate que la vista 'user_dashboard.peinados_cortes' existe
+
         return view('user_dashboard.peinados_cortes', ['nick' => $nick]);
     }
 }
