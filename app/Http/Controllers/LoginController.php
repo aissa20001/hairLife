@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
-// use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Hash;
 // use Illuminate\Support\Str;
 
 class LoginController extends Controller
@@ -18,18 +18,18 @@ class LoginController extends Controller
     {
         $credentials = $request->only('Nombre', 'Clave');
 
-        $usuario = Usuario::where('Nombre', $credentials['Nombre'])
-            ->where('Clave', $credentials['Clave'])
-            ->first();
+        $usuario = Usuario::where('Nombre', $credentials['Nombre'])->first();
 
-        if ($usuario) {
+
+        //  Verificar si el usuario existe Y si la contraseña proporcionada coincide con el hash almacenado
+        if ($usuario && Hash::check($credentials['Clave'], $usuario->Clave)) {
+            // Si la autenticación es exitosa, se inicia la sesión
             session([
-                'usuario_codigo' => $usuario->Codigo,
+                'usuario_codigo' => $usuario->Codigo, //
                 'usuario_nombre' => $usuario->Nombre, //Nombre usado para login
-                'usuario_rol' => $usuario->Rol,
+                'usuario_rol' => $usuario->Rol, //
                 'usuario_display_nick' => $usuario->nick // Guardamos  el nick de display (columna 'nick')
-            ]);
-
+            ]); //
             $urlDestino = '/';
 
             if ($usuario->Rol == 1) { // Admin
@@ -56,7 +56,8 @@ class LoginController extends Controller
             return redirect($urlDestino);
         }
 
-        return back()->withErrors(['login' => 'Nombre o clave incorrectos']);
+        return back()->withErrors(['login' => 'Nombre o clave incorrectos'])
+            ->withInput($request->only('Nombre')); // Devolver solo el 'Nombre' para que no tenga que volver a escribirlo;
     }
 
     public function logout()

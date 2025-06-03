@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class Usuario extends Model // O solo `Model` si no es para autenticación de Laravel directamente
 {
@@ -21,9 +22,16 @@ class Usuario extends Model // O solo `Model` si no es para autenticación de La
         'nick',
     ];
 
+
     protected $hidden = [
         'Clave', // Para no exponer la clave en serializaciones
     ];
+    public function setClaveAttribute($value) // <-- Este es el mutador
+    {
+        if ($value) { // Solo hashea si se proporciona un valor
+            $this->attributes['Clave'] = Hash::make($value);
+        }
+    }
 
     // Relación: Un usuario puede tener muchos envíos de cuestionarios
     public function cuestionarioEnvios()
