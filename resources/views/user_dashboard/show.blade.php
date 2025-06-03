@@ -59,7 +59,28 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            margin: 0;
+            position: relative;
+            /* Mantenlo para el body::before */
+            z-index: 0;
+        }
+
+        body::before {
+            /* Este es tu fondo con patrón global */
+            content: "";
+            position: fixed;
+            /* Fijo para que cubra toda la ventana detrás de todo */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('/storage/imagenes/fondo.jpg');
+            /* */
+            background-repeat: repeat;
+            background-size: 250px;
+            opacity: 0.2;
+            z-index: -1;
+            /* Detrás de todo el contenido del body */
+            pointer-events: none;
         }
 
         .header-panel {
@@ -96,30 +117,10 @@
             padding-top: 50px;
             padding-bottom: 50px;
             background-color: var(--section-bg);
+            background-color: transparent;
             border-bottom: 1px solid #eee;
             border-top: 1px solid #eee;
             position: relative;
-        }
-
-        .buttons-panel-section::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 115%;
-
-            background-image: url('/storage/imagenes/fondo.jpg');
-            /* ¡ESTA ES LA RUTA CORRECTA! */
-
-            background-repeat: repeat;
-            background-size: 250px;
-            /* Ajusta según necesites */
-            opacity: 0.2;
-            /* Ajusta para la sutileza deseada */
-            z-index: 0.5;
-            margin: 0;
-
         }
 
         .cards-container {

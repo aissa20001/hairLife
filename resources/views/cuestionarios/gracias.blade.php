@@ -51,14 +51,12 @@
             color: darkslategrey;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            padding: 20px;
             text-align: center;
             box-sizing: border-box;
             position: relative;
             z-index: 0;
+            margin: 0;
         }
 
         body::before {
@@ -85,6 +83,23 @@
             /* Se coloca detrás de todo el contenido del body */
             pointer-events: none;
             /* Para asegurar que no interfiera con clics u otras interacciones */
+        }
+
+        .main-gracias-content {
+            flex-grow: 1;
+            /* Este es el importante: hace que este div crezca y ocupe el espacio disponible */
+            display: flex;
+            flex-direction: column;
+            /* Para centrar el .gracias-container si hay otros elementos aquí */
+            justify-content: center;
+            /* Centra el .gracias-container verticalmente en el espacio que ocupa */
+            align-items: center;
+            /* Centra el .gracias-container horizontalmente */
+            width: 100%;
+            padding: 20px;
+            /* Mantenemos el padding aquí para el contenido */
+            box-sizing: border-box;
+            text-align: center;
         }
 
         .gracias-container {
@@ -170,31 +185,49 @@
             background-color: var(--purple-dark);
             color: var(--text-on-purple);
         }
+
+        .site-footer {
+            background-color: var(--purple-dark);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 5px 0;
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: auto;
+
+        }
     </style>
 </head>
 
 <body>
-    <div class="gracias-container">
-        <i class="bi bi-check-circle-fill gracias-icon"></i>
-        <h1>¡Cuestionario Enviado!</h1>
+    {{-- Contenido principal envuelto para Flexbox --}}
+    <div class="main-gracias-content">
+        <div class="gracias-container">
+            <i class="bi bi-check-circle-fill gracias-icon"></i>
+            <h1>¡Cuestionario Enviado!</h1>
 
-        @if (session('success'))
-        <p class="session-success">{{ session('success') }}</p>
-        @else
-        <p>Gracias por completar nuestro cuestionario y dedicar tu tiempo.</p>
-        @endif
+            @if (session('success'))
+            <p class="session-success">{{ session('success') }}</p>
+            @else
+            <p>Gracias por completar nuestro cuestionario y dedicar tu tiempo.</p>
+            @endif
 
-        {{-- Contenedor del Loader y mensaje de redirección --}}
-        @if (isset($recomendacionId) && $recomendacionId !== null)
-        <div class="loader-container" id="loaderContainer">
-            <div class="loader"></div>
-            <p class="loading-text">Estamos preparando tu recomendación personalizada...</p>
+            {{-- Contenedor del Loader y mensaje de redirección --}}
+            @if (isset($recomendacionId) && $recomendacionId !== null)
+            <div class="loader-container" id="loaderContainer">
+                <div class="loader"></div>
+                <p class="loading-text">Estamos preparando tu recomendación personalizada...</p>
+            </div>
+            @else
+            <p>Revisaremos tus respuestas con atención.</p>
+            <a href="{{ route('crear.nick') }}" class="btn btn-lg btn-purple-home mt-3">Volver al inicio</a>
+            @endif
         </div>
-        @else
-        <p>Revisaremos tus respuestas con atención.</p>
-        <a href="{{ route('crear.nick') }}" class="btn btn-lg btn-purple-home mt-3">Volver al inicio</a>
-        @endif
     </div>
+
+    {{-- El footer ahora es un hijo directo del body flex container --}}
+    <footer class="site-footer">
+        <p>&copy; {{ date('Y') }} HairLife. Todos los derechos reservados.</p>
+    </footer>
 
     @if (isset($recomendacionId) && $recomendacionId !== null)
     <script>

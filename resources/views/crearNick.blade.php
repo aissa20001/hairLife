@@ -322,6 +322,16 @@
             }
         }
 
+        .site-footer {
+            background-color: var(--purple-dark);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 5px 0;
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: auto;
+
+        }
+
         /* La media query anterior para .main-content-area (apilar elementos) ya no es relevante
            para las tarjetas, pero la de .nick-creation-container y títulos sigue siendo útil. */
     </style>
@@ -375,6 +385,9 @@
         </div>
 
     </div>
+    <footer class="site-footer">
+        <p>&copy; {{ date('Y') }} HairLife. Todos los derechos reservados.</p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

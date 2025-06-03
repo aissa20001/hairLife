@@ -225,6 +225,16 @@
             background-color: var(--purple-very-light);
             text-decoration: none;
         }
+
+        .site-footer {
+            background-color: var(--purple-dark);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 5px 0;
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: auto;
+
+        }
     </style>
 </head>
 
@@ -305,7 +315,11 @@
             @endif
             <a href="{{ route('login') }}">Cerrar Sesión</a>
         </div>
+
     </div>
+    <footer class="site-footer">
+        <p>&copy; {{ date('Y') }} HairLife. Todos los derechos reservados.</p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

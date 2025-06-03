@@ -59,10 +59,10 @@
         /* --- Estilos generales para el cuerpo (body) de la página --- */
         body {
             display: flex;
-            /* Activa Flexbox para centrar contenido. */
-            align-items: center;
+            flex-direction: column;
+
             /* Centra verticalmente el contenido hijo (el .login-container). */
-            justify-content: center;
+
             /* Centra horizontalmente el contenido hijo. */
             min-height: 100vh;
             /* Asegura que el cuerpo ocupe al menos toda la altura de la pantalla. */
@@ -98,6 +98,19 @@
             /* Se coloca detrás de todo el contenido del body */
             pointer-events: none;
             /* Para asegurar que no interfiera con clics u otras interacciones */
+        }
+
+        .main-login-wrapper {
+            flex-grow: 1;
+            /* Hace que este div ocupe todo el espacio vertical disponible */
+            display: flex;
+            align-items: center;
+            /* Centra el login-container verticalmente dentro del wrapper */
+            justify-content: center;
+            /* Centra el login-container horizontalmente */
+            width: 100%;
+            padding: 20px 0;
+            /* Añade un poco de espacio arriba/abajo si es necesario */
         }
 
         /* --- Contenedor principal de la sección de login --- */
@@ -331,58 +344,75 @@
                 /* Menos espaciado interno. */
             }
         }
+
+        .site-footer {
+            background-color: var(--morado-oscuro);
+            /* Usa tus variables de color existentes */
+            color: rgba(255, 255, 255, 0.8);
+            padding: 15px 0;
+            text-align: center;
+            font-size: 0.9em;
+            width: 100%;
+            /* Asegura que ocupe todo el ancho */
+            flex-shrink: 0;
+
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="login-container">
-        <div class="login-image-section">
-        </div>
-
-
-        <div class="login-form-section">
-            <h1 class="welcome-title">Bienvenid@s a HairLife</h1>
-            <p class="welcome-subtitle">Asesoramiento capilar</p>
-
-            <h2>Iniciar sesión</h2>
-
-            @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="main-login-wrapper"> {{-- NUEVO CONTENEDOR --}}
+        <div class="login-container">
+            <div class="login-image-section">
             </div>
-            @endif
+            <div class="login-form-section">
+                <h1 class="welcome-title">Bienvenid@s a HairLife</h1>
+                <p class="welcome-subtitle">Asesoramiento capilar</p>
+                <h2>Iniciar sesión</h2>
 
-            @if (session('error_login'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error_login') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                @endif
+
+                @if (session('error_login'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error_login') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                @endif
+
+                <form action="/login" method="POST"> @csrf
+                    <div class="mb-3">
+                        <label for="nombreUsuario" class="form-label">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="nombreUsuario" name="Nombre" placeholder="Tu nombre de usuario" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="claveUsuario" class="form-label">Clave</label>
+                        <input type="password" class="form-control" id="claveUsuario" name="Clave" placeholder="Tu clave" required>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+                    </div>
+                </form>
             </div>
-            @endif
-
-            <form action="/login" method="POST">
-                @csrf
-                <div class="mb-3">
-                    <label for="nombreUsuario" class="form-label">Nombre de usuario</label>
-                    <input type="text" class="form-control" id="nombreUsuario" name="Nombre" placeholder="Tu nombre de usuario" required>
-                </div>
-                <div class="mb-3">
-                    <label for="claveUsuario" class="form-label">Clave</label>
-                    <input type="password" class="form-control" id="claveUsuario" name="Clave" placeholder="Tu clave" required>
-                </div>
-                <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-primary">Iniciar sesión</button>
-                </div>
-            </form>
         </div>
-    </div>
+    </div> {{-- FIN DEL NUEVO CONTENEDOR --}}
+
+    <footer class="site-footer"> {{-- NUEVO FOOTER --}}
+        <p>&copy; {{ date('Y') }} HairLife. Todos los derechos reservados.</p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 
 </html>
