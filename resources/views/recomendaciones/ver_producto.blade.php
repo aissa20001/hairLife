@@ -112,7 +112,7 @@
             background-color: var(--purple-primary);
             color: var(--text-on-purple);
             border: 1px solid var(--purple-dark);
-            padding: 0.5rem 0.9rem;
+            padding: 0.5rem 1.5rem;
             font-size: 1.2rem;
             border-radius: 0.5rem;
             /* La sombra usa la variable RGB para `text-on-purple` (blanco). */
@@ -324,7 +324,7 @@
         <!-- Botón de "Volver al cuestionario".
              Usa la clase `btn` de Bootstrap para el estilo base y un icono de Bootstrap Icons. -->
         <a href="{{ $homeLink }}" class="btn home-button" title="Volver al cuestionario para elegir otra categoría">
-            <i class="bi bi-clipboard2-pulse"></i>
+            <i class="bi bi-clipboard2-pulse me-2"></i>Volver al cuestionario
         </a>
     </div>
 
