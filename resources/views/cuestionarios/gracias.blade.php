@@ -208,6 +208,7 @@
             @else
             {{-- Caso: Producto NO ENCONTRADO -> Mostrar los dos botones de acción --}}
             {{-- El párrafo "Revisaremos tus respuestas con atención." ha sido eliminado. --}}
+            <p>Apreciamos sinceramente tu tiempo y esfuerzo al completar el cuestionario. Lamentablemente, no hemos podido encontrar una recomendación de producto específica basada en tus respuestas en este momento.</p>
             <div class="buttons-container-gracias mt-4">
                 @if (isset($id_cuestionario_actual) && $id_cuestionario_actual && isset($nick))
                 <a href="{{ route('cuestionarios.mostrarParaNick', ['nick' => $nick, 'id_cuestionario' => $id_cuestionario_actual]) }}" class="btn btn-lg btn-outline-purple">
