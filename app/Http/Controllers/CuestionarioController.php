@@ -100,6 +100,8 @@ class CuestionarioController extends Controller
         // Mensaje por defecto si no encuentro un producto que cumpla los filtros principales.
         $justificacionFinal = "No se encontró un producto que coincida con tu categoría ('" . $categoriaProductoElegida . "') y tipo de cabello especificados.";
         $palabrasClaveCoincidentesParaJustificacion = []; // Para construir un mensaje de justificación claro.
+        $productoConMayorPuntuacionFallback = null;
+        $mayorPuntuacionFallback = -1;
 
         //  Separar el criterio de "Tipo de Cabello" del resto 
         // Necesito el tipo de cabello como un filtro principal, y los demás criterios para la puntuación.
@@ -267,32 +269,32 @@ class CuestionarioController extends Controller
                 $productoRecomendado = $producto;
                 $palabrasClaveCoincidentesParaJustificacion = array_unique($palabrasAdicionalesQueCoincidieronEnEsteProducto);
             }
-        }
 
+            //  Guardamos siempre el producto con la puntuación más alta, independientemente del umbral,
+            // para usarlo en el nuevo fallback.
+            if ($porcentajeCoincidenciaAdicional > $mayorPuntuacionFallback) {
+                $mayorPuntuacionFallback = $porcentajeCoincidenciaAdicional;
+                $productoConMayorPuntuacionFallback = $producto;
+            }
+        }
         //  Construir la justificación final y devolver el resultado 
-        if ($productoRecomendado) { // Si encontré un producto que superó el umbral.
+        if ($productoRecomendado) {
+            //Se encontró una recomendación ideal .
             $justificacionFinal = "Considerando la categoría '" . $categoriaProductoElegida . "' y tu tipo de cabello ('" . $textoTipoCabelloParaJustificacion . "'), y ";
             if (!empty($palabrasClaveCoincidentesParaJustificacion)) {
                 $justificacionFinal .= "tus preferencias por: " . implode(", ", array_map('htmlspecialchars', $palabrasClaveCoincidentesParaJustificacion));
                 $justificacionFinal .= " (coincidencia de estos criterios adicionales: " . round($mejorPuntuacionAdicional) . "%), ";
-            } else if ($mejorPuntuacionAdicional >= 0 && !empty($palabrasClaveAdicionalesUsuario)) {
-                // Había criterios adicionales, pero el producto recomendado no coincidió con ninguno de ellos (o su puntuación fue 0),
-                // pero aun así fue el "mejor" (quizás el único que pasó los filtros principales).
-                $justificacionFinal .= "aunque no encontramos una alta coincidencia con otros criterios específicos (0% de coincidencia adicional relevante), ";
             } else {
-                // No había criterios adicionales para puntuar, así que la recomendación se basa solo en categoría y tipo de cabello.
-                $justificacionFinal .= "basándonos en estos filtros principales, ";
+                $justificacionFinal .= "basándonos en los filtros principales, ";
             }
             $justificacionFinal .= "te recomendamos '" . $productoRecomendado->nombre . "'.";
-        } else {
-            // FALLBACK: Si no encontré ningún producto que superara el umbral de los criterios adicionales,
-            // pero SÍ tenía productos que cumplían categoría y tipo de cabello, recomiendo el primero de ellos.
-            if (!empty($productosFiltradosPorTipoCabello)) {
-                $productoRecomendado = $productosFiltradosPorTipoCabello[0];
-                $justificacionFinal = "Para la categoría '" . $categoriaProductoElegida . "' y tu tipo de cabello ('" . $textoTipoCabelloParaJustificacion . "'), una opción general es '" . $productoRecomendado->nombre . "'. No pudimos encontrar una coincidencia alta con todos tus otros criterios específicos, pero este producto se ajusta a lo principal.";
-            }
-            // Si $productosFiltradosPorTipoCabello estaba vacío, la $justificacionFinal ya tiene el mensaje de error adecuado del Paso 3.
+        } else if ($productoConMayorPuntuacionFallback && $mayorPuntuacionFallback > 0) {
+            // No hay recomendación ideal, pero sí hay un producto con una puntuación > 0.
+            // Se recomienda el que tuvo la puntuación más alta.
+            $productoRecomendado = $productoConMayorPuntuacionFallback;
+            $justificacionFinal = "Aunque ningún producto superó nuestro umbral de coincidencia ideal del " . $umbralPorcentaje . "%, el que más se acerca a tus necesidades específicas (con un " . round($mayorPuntuacionFallback) . "% de coincidencia en criterios adicionales) es '" . htmlspecialchars($productoRecomendado->nombre) . "'. Se ajusta a la categoría '" . htmlspecialchars($categoriaProductoElegida) . "' y a tu tipo de cabello ('" . htmlspecialchars($textoTipoCabelloParaJustificacion) . "').";
         }
+
 
         return ['producto' => $productoRecomendado, 'justificacion' => $justificacionFinal];
     }
