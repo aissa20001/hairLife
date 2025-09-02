@@ -21,5 +21,4 @@ Gestión de productos para el administrador (CRUD).
 Documentación Completa del Proyecto Para obtener información detallada sobre la estructura, la implementación, las capturas de pantalla de la aplicación y la gestión de bases de datos, puedes consultar el documento completo del proyecto:
 
 Haz clic aquí para ver la documentación completa en PDF:
-
 documentación.pdf
