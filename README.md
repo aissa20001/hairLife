@@ -23,4 +23,4 @@ Documentación Completa del Proyecto Para obtener información detallada sobre l
 Haz clic aquí para ver la documentación completa en PDF:
 
 
-documentación.pdf
+[documentación.pdf](https://github.com/aissa20001/hairLife/blob/main/documentaci%C3%B3n.pdf)
