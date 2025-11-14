@@ -54,6 +54,7 @@ php artisan storage:link
 6- Iniciar el servidor de desarrollo de Laravel
 php artisan serve
 
+-------------------------------------------------------------------------------------------------------------
 PERFILES DE PRUEBA
 
 user: aissa   password: 1234
