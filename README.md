@@ -20,10 +20,19 @@ Gestión de productos para el administrador (CRUD).
 
 DEMOSTRACIÓN DE LA PLATAFORMA HAIRLIFE:
 
+
 <img width="576" height="318" alt="image" src="https://github.com/user-attachments/assets/9fd46b96-0172-461b-ae29-202d8a4c418b" />
+
 <img width="591" height="285" alt="image" src="https://github.com/user-attachments/assets/127573f9-c979-4a8b-ba89-4dc27b769d48" />
+
 <img width="597" height="287" alt="image" src="https://github.com/user-attachments/assets/cd8590c5-beb2-47ce-b232-886971c33135" />
+
 <img width="610" height="295" alt="image" src="https://github.com/user-attachments/assets/2857791b-c243-4d89-9ddf-8bbe5ee6c83e" />
+
+
+
+
+
 
 
 
