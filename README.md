@@ -21,6 +21,7 @@ Gestión de productos para el administrador (CRUD).
 Documentación Completa del Proyecto Para obtener información detallada sobre la estructura, la implementación, las capturas de pantalla de la aplicación y la gestión de bases de datos, puedes consultar el documento completo del proyecto:
 
 Haz clic aquí para ver la documentación completa en PDF:
+<img width="576" height="318" alt="image" src="https://github.com/user-attachments/assets/9fd46b96-0172-461b-ae29-202d8a4c418b" />
 
 
 [documentación.pdf](https://github.com/aissa20001/hairLife/blob/main/documentaci%C3%B3n.pdf)
