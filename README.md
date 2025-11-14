@@ -32,10 +32,7 @@ DEMOSTRACIÓN DE LA PLATAFORMA HAIRLIFE:
 
 
 
-
-
-
-
+-----------------------------------------------------------------------------------------------------------
 
 
 Dado que el proyecto HairLife no está desplegado, puedes probar toda su funcionalidad siguiendo estos pasos:
